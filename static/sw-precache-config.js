@@ -31,7 +31,7 @@ importScripts("sw-toolbox-config.js");
 
 
 /* eslint-disable quotes, comma-spacing */
-var PrecacheConfig = [["/app/pager/images/fist-enclosed-black.png","43414b21489da5e8ae6d581182fbe7ad"],["/app/pager/images/missing.png","1e9d5c0d435951ebb43b1310a8c76b69"],["/app/pager/images/pisignagelogo.png","53e9c50ce59c3a73657c74ba597b714e"],["/app/pager/index.html","12c047ae5de9ad3c234297daaaa345e0"],["/app/pager/js/bundle.js","a21052b210dc315950b51bd20ae30016"],["/app/pager/js/localforage.min.js","a24e81ce13caebbf01fa629edaaffdc3"],["/app/pager/js/register-service-worker.js","69e1cd65674245edb135ac7e876d9e18"],["/app/pager/js/sw-toolbox.js","66531e5962e4dccb0526a2b4cd6364a4"],["/app/pager/manifest.json","ca8468240aff976225081ee4a3a4acfa"]];
+var PrecacheConfig = [["/images/fist-enclosed-black.png","43414b21489da5e8ae6d581182fbe7ad"],["/images/missing.png","1e9d5c0d435951ebb43b1310a8c76b69"],["/images/pisignagelogo.png","53e9c50ce59c3a73657c74ba597b714e"],["/index.html","12c047ae5de9ad3c234297daaaa345e0"],["/js/bundle.js","a21052b210dc315950b51bd20ae30016"],["/js/localforage.min.js","a24e81ce13caebbf01fa629edaaffdc3"],["/js/register-service-worker.js","69e1cd65674245edb135ac7e876d9e18"],["/js/sw-toolbox.js","66531e5962e4dccb0526a2b4cd6364a4"],["/manifest.json","ca8468240aff976225081ee4a3a4acfa"]];
 /* eslint-enable quotes, comma-spacing */
 var CacheNamePrefix = 'sw-precache-v1-pisignage-pager-' + (self.registration ? self.registration.scope : '') + '-';
 

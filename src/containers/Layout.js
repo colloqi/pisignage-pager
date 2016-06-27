@@ -25,6 +25,10 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 import urls from '../constants/urls';
 
+import Players from  '../components/players';
+import TokenSettings from '../components/tokenSettings';
+import Tokens from '../components/tokens';
+
 let Layout = React.createClass({
     getChildContext: function () {
         return {muiTheme: getMuiTheme(baseTheme)};
@@ -56,13 +60,13 @@ let Layout = React.createClass({
                     onChangeIndex={this.handleChange}
                 >
                     <div>
-                        Tokens
+                        <Tokens />
                     </div>
                     <div >
-                        Pager Sttings
+                        <TokenSettings/>
                     </div>
                     <div >
-                        PiSignage Players
+                        <Players />
                     </div>
                 </SwipeableViews>
             </div>
