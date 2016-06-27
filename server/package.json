@@ -1,0 +1,20 @@
+{
+    "name": "colloqi-client",
+    "version": "0.1.0",
+    "description": "Progressive Web App for Colloqi Reporting Tool",
+    "main": "index.js",
+    "author": "Colloqi <info@colloqi.com> (https://colloqi.com)",
+    "license": "",
+    "homepage": "",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/colloqi/colloqi-client.git"
+    },
+    "dependencies": {
+        "compression": "^1.6.0",
+        "express": "^4.13.3"
+    },
+    "engines": {
+        "node": ">=0.12.7"
+    }
+}

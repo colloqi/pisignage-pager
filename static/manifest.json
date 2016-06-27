@@ -1,0 +1,16 @@
+{
+    "name": "PiSignage-Pager",
+    "short_name": "PiPager",
+    "icons": [
+        {
+            "src": "/app/images/pisignagelogo.png",
+            "type": "image/png",
+            "sizes": "96x96"
+        }
+    ],
+    "start_url": "/app/pager/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "background_color": "#E3F2FD",
+    "theme_color": "#2ECCFA"
+}
