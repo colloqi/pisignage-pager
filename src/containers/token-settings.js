@@ -1,4 +1,6 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
+import {connect} from 'react-redux';
+
 import Subheader from 'material-ui/Subheader';
 import {List, ListItem} from 'material-ui/List';
 import TextField from 'material-ui/TextField';
@@ -10,6 +12,8 @@ import Toggle from 'material-ui/Toggle';
 import Divider from 'material-ui/Divider';
 import Slider from 'material-ui/Slider';
 
+import {clearTokens,generateTokens,setVolume} from "../actions/token-settings"
+
 let VolumeLevel = React.createClass ({
 
     getInitialState: function () {
@@ -18,6 +22,7 @@ let VolumeLevel = React.createClass ({
 
     handleChange(event, value) {
         this.setState({volume: value});
+        this.props.cb(value);
     },
 
     render() {
@@ -38,19 +43,52 @@ let VolumeLevel = React.createClass ({
     }
 })
 
-export default React.createClass({
+VolumeLevel.propTypes = {
+    volume: PropTypes.number.isRequired,
+    cb: PropTypes.func.isRequired,
+};
+
+
+let TokenSettings = React.createClass({
     getInitialState: function(){
-        return({modalOpen: false})
+        return({
+            modalOpen: false,
+            from: 1,
+            till: 100,
+            counters: [],
+            tokens: [],
+            volume: 5
+        })
     },
     displayModal: function(){
-        console.log('modal open');
+        //console.log('modal open');
         this.setState({modalOpen: true});
     },
     displayModalClose: function(){
         this.setState({modalOpen: false});
     },
-    changeRange: function(){
-        console.log('range change');
+    generateTokens: function(){
+        //console.log('range change');
+        //send an Action to generate Tokens
+        let tokens = []
+        for (let i=parseInt(this.state.from);i<=parseInt(this.state.till);i++) {
+            tokens.push(i);
+        }
+        const {dispatch} = this.props;
+        this.displayModalClose()
+        dispatch(generateTokens(tokens))
+    },
+    clearTokens: function(){
+        console.log('clear tokens');
+        //send an Action to clear Token
+        const {dispatch} = this.props;
+        dispatch(clearTokens())
+    },
+    setVolume: function(value){
+        console.log('set volume');
+        //send an Action to volume
+        const {dispatch} = this.props;
+        dispatch(setVolume(value))
     },
     render: function () {
         let modelActions = [
@@ -62,7 +100,7 @@ export default React.createClass({
             <RaisedButton
                 label="Ok"
                 primary={true}
-                onTouchTap={this.changeRange}
+                onTouchTap={this.generateTokens}
             />
         ]
         return (
@@ -83,19 +121,24 @@ export default React.createClass({
                         >
                             <TextField
                                 type="number"
+                                name="from"
                                 hintText=""
                                 floatingLabelText="From"
+                                onChange = {(e) => {this.setState({from: e.target.value})}}
                             /><br/>
                             <TextField
                                 type="number"
+                                name="till"
                                 hintText=""
                                 floatingLabelText="Till"
+                                onChange = {(e) => {this.setState({till: e.target.value})}}
                             />
                         </Dialog>
                     </ListItem>
                     <ListItem
                         primaryText="Clear All"
                         secondaryText="Clear All tokens"
+                        onTouchTap={this.clearTokens}
                     />
                     <Divider />
                     <Subheader>Counters</Subheader>
@@ -112,9 +155,25 @@ export default React.createClass({
                     </ListItem>
                     <Divider />
                     <Subheader>Sound</Subheader>
-                    <ListItem><VolumeLevel/></ListItem>
+                    <ListItem><VolumeLevel volume={this.props.volume} cb={this.setVolume} /></ListItem>
                 </List>
             </div>
         )
     }
 })
+
+TokenSettings.propTypes = {
+    volume: PropTypes.number.isRequired,
+    counters: PropTypes.array.isRequired,
+    tokens: PropTypes.array.isRequired
+};
+
+function mapStateToProps(state) {
+    return {
+        volume: state.token.volume,
+        counters: state.token.counters,
+        tokens: state.token.tokens,
+    };
+}
+
+export default connect(mapStateToProps)(TokenSettings);

@@ -1,15 +1,10 @@
-import React from 'react';
+import React, {Component, PropTypes} from 'react';
+import {connect} from 'react-redux';
 
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import {List, ListItem} from 'material-ui/List'
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
-
-let dummyTokens = [
-{ title: 1 , key: 1},
-{ title: 2 , key: 2},
-{ title: 3 , key: 3}
-];
 
 let formValue = 10;
 let AddToken = React.createClass({
@@ -32,16 +27,13 @@ let AddToken = React.createClass({
 })
 
 let TokenList = React.createClass({
-	getInitialState: function(){
-		return {totalEntry: dummyTokens};
-	},
-	render: function(){	
+	render: function(){
 		let tokens = [];
 
-		for(let entry of this.state.totalEntry){
+		for(let entry of this.props.tokens){
 			console.log(entry)
 			tokens.push(
-					<li key={entry.key}>{entry.title}</li>
+					<li key={entry}>{entry}</li>
 			)
 		};
 
@@ -56,14 +48,29 @@ let TokenList = React.createClass({
 })
 
 
-export default React.createClass({
+let Tokens = React.createClass({
 	render : function(){
 		return (
 			<div>
-				<AddToken />
-				<TokenList />
+				<TokenList tokens={this.props.tokens} />
 				
 			</div>
 		)
 	}
 })
+
+Tokens.propTypes = {
+    counters: PropTypes.array.isRequired,
+    tokens: PropTypes.array.isRequired
+};
+
+function mapStateToProps(state) {
+    console.log("tokens getting ")
+    console.log(state.token)
+    return {
+        counters: state.token.counters,
+        tokens: state.token.tokens,
+    };
+}
+
+export default connect(mapStateToProps)(Tokens);

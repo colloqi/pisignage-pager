@@ -2,20 +2,26 @@ import fetch from 'isomorphic-fetch';
 import * as actionTypes from '../constants/ActionTypes';
 import urls from '../constants/urls';
 
-export function receivedData(data, key) {
+export function clearTokens() {
     return {
-        type: actionTypes.RECEIVED_DATA,
-        data,
-        key
+        type: actionTypes.CLEAR_TOKENS
     }
 }
 
-export function fileUploaded(data) {
+export function generateTokens(tokens) {
     return {
-        type: actionTypes.FILE_UPLOADED,
-        data
+        type: actionTypes.GENERATE_TOKENS,
+        tokens
     }
 }
+
+export function setVolume(volume) {
+    return {
+        type: actionTypes.SET_VOLUME,
+        volume
+    }
+}
+
 
 export function fetchUrl(options) {
     return (dispatch,getState) => {

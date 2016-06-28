@@ -25,8 +25,8 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 import urls from '../constants/urls';
 
 import Players from  '../components/players';
-import TokenSettings from '../components/tokenSettings';
-import Tokens from '../components/tokens';
+import TokenSettings from './token-settings';
+import Tokens from './tokens';
 
 let Layout = React.createClass({
     getChildContext: function () {
