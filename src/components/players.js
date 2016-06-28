@@ -6,6 +6,7 @@ import Subheader from 'material-ui/Subheader';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
+import FlatButton from 'material-ui/RaisedButton'
 import FloatingActionButton from 'material-ui/FloatingActionButton';
 import SendIcon from 'material-ui/svg-icons/content/send';
 import CloseIcon from 'material-ui/svg-icons/navigation/close';
@@ -77,8 +78,13 @@ export default React.createClass({
 	render: function(){
 		return (
 			<div>
-				<PlayerAdd />
-				<PlayerList players={players} />
+                <ListItem>
+                    <TextField
+                        style={{width: "70%"}} type="text"
+                        hintText="Add Player IP"
+                    />
+                    <FlatButton primary={true} onMouseUp={this.search} label="Add"/>
+                </ListItem>
 				
 			</div>
 		)

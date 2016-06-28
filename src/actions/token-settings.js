@@ -22,6 +22,34 @@ export function setVolume(volume) {
     }
 }
 
+export function addCounter(counter) {
+    return {
+        type: actionTypes.ADD_COUNTER,
+        counter
+    }
+}
+
+export function delCounter(counter) {
+    return {
+        type: actionTypes.DEL_COUNTER,
+        counter
+    }
+}
+
+export function addToken(token) {
+    return {
+        type: actionTypes.ADD_TOKEN,
+        token
+    }
+}
+
+export function delToken(token) {
+    return {
+        type: actionTypes.DEL_TOKEN,
+        token
+    }
+}
+
 
 export function fetchUrl(options) {
     return (dispatch,getState) => {

@@ -5,23 +5,20 @@ import Subheader from 'material-ui/Subheader';
 import {List, ListItem} from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
+import Snackbar from 'material-ui/Snackbar';
 import RaisedButton from 'material-ui/RaisedButton'
 
 import FlatButton from 'material-ui/FlatButton';
-import Toggle from 'material-ui/Toggle';
 import Divider from 'material-ui/Divider';
 import Slider from 'material-ui/Slider';
 
-import {clearTokens,generateTokens,setVolume} from "../actions/token-settings"
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-let VolumeLevel = React.createClass ({
+import {clearTokens, generateTokens, setVolume, addCounter, delCounter} from "../actions/token-settings"
 
-    getInitialState: function () {
-        return {volume: this.props.volume || 5};
-    },
+let VolumeLevel = React.createClass({
 
     handleChange(event, value) {
-        this.setState({volume: value});
         this.props.cb(value);
     },
 
@@ -34,8 +31,7 @@ let VolumeLevel = React.createClass ({
                     min={0}
                     max={10}
                     step={1}
-                    defaultValue={5}
-                    value={this.state.volume}
+                    value={this.props.volume}
                     onChange={this.handleChange}
                 />
             </div>
@@ -48,50 +44,76 @@ VolumeLevel.propTypes = {
     cb: PropTypes.func.isRequired,
 };
 
+let CounterList = React.createClass({
+    render: function () {
+        let counters = [];
+        for (let entry of this.props.counters) {
+            counters.push(
+                <ListItem key={entry} primaryText={entry}
+                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(this,entry)} />
+                }/>
+            )
+        }
+        return (
+            <div>
+                {counters}
+            </div>
+        )
+    }
+})
+
+CounterList.propTypes = {
+    counters: PropTypes.array.isRequired,
+    cb: PropTypes.func.isRequired
+};
+
 
 let TokenSettings = React.createClass({
-    getInitialState: function(){
-        return({
+    getInitialState: function () {
+        return ({
             modalOpen: false,
+            snackbarOpen: false,
+            counterText: "",
             from: 1,
-            till: 100,
-            counters: [],
-            tokens: [],
-            volume: 5
+            till: 100
         })
     },
-    displayModal: function(){
-        //console.log('modal open');
+    displayModalOpen: function () {
         this.setState({modalOpen: true});
     },
-    displayModalClose: function(){
+    displayModalClose: function () {
         this.setState({modalOpen: false});
     },
-    generateTokens: function(){
-        //console.log('range change');
-        //send an Action to generate Tokens
+    snackbarModalOpen: function () {
+        this.setState({snackbarOpen: true});
+    },
+    snackbarModalClose: function () {
+        this.setState({snackbarOpen: false});
+    },
+    generateTokens: function () {
         let tokens = []
-        for (let i=parseInt(this.state.from);i<=parseInt(this.state.till);i++) {
+        for (let i = parseInt(this.state.from); i <= parseInt(this.state.till); i++) {
             tokens.push(i);
         }
-        const {dispatch} = this.props;
+        this.props.dispatch(generateTokens(tokens))
         this.displayModalClose()
-        dispatch(generateTokens(tokens))
     },
-    clearTokens: function(){
-        console.log('clear tokens');
-        //send an Action to clear Token
-        const {dispatch} = this.props;
-        dispatch(clearTokens())
+    clearTokens: function () {
+        this.props.dispatch(clearTokens())
+        this.snackbarModalOpen();
     },
-    setVolume: function(value){
-        console.log('set volume');
-        //send an Action to volume
-        const {dispatch} = this.props;
-        dispatch(setVolume(value))
+    addCounter: function () {
+        this.props.dispatch(addCounter(this.state.counterText))
+        this.state.counterText = "";
+    },
+    delCounter: function (counter, e) {
+        this.props.dispatch(delCounter(counter))
+    },
+    setVolume: function (value) {
+        this.props.dispatch(setVolume(value))
     },
     render: function () {
-        let modelActions = [
+        const modelActions = [
             <FlatButton
                 label="Cancel"
                 secondary={true}
@@ -102,62 +124,70 @@ let TokenSettings = React.createClass({
                 primary={true}
                 onTouchTap={this.generateTokens}
             />
-        ]
+        ];
+
         return (
-            <div>
-                <List>
-                    <Subheader>Token Settings</Subheader>
-                    <ListItem
-                        primaryText="Generate Tokens"
-                        secondaryText="Creates tokens between 2 values"
-                        onTouchTap={this.displayModal}
+            <List>
+                <Subheader>Token Settings</Subheader>
+                <ListItem
+                    primaryText="Generate Tokens"
+                    secondaryText="Creates tokens between 2 values"
+                    onTouchTap={this.displayModalOpen}
+                >
+                    <Dialog
+                        title="Auto Generate"
+                        actions={modelActions}
+                        modal={false}
+                        open={this.state.modalOpen}
+                        onRequestClose={this.displayModalClose}
                     >
-                        <Dialog 
-                            title="Auto Generate"
-                            actions={modelActions}
-                            modal={false}
-                            open={this.state.modalOpen}
-                            onRequestClose={this.displayModalClose}
-                        >
-                            <TextField
-                                type="number"
-                                name="from"
-                                hintText=""
-                                floatingLabelText="From"
-                                onChange = {(e) => {this.setState({from: e.target.value})}}
-                            /><br/>
-                            <TextField
-                                type="number"
-                                name="till"
-                                hintText=""
-                                floatingLabelText="Till"
-                                onChange = {(e) => {this.setState({till: e.target.value})}}
-                            />
-                        </Dialog>
-                    </ListItem>
-                    <ListItem
-                        primaryText="Clear All"
-                        secondaryText="Clear All tokens"
-                        onTouchTap={this.clearTokens}
-                    />
-                    <Divider />
-                    <Subheader>Counters</Subheader>
-                    <ListItem
-                        primaryText="Default"
-                        secondaryText="Touch to Edit"
-                    />
-                    <ListItem>
                         <TextField
-                            style={{width: "70%"}} type="text"
-                            hintText="Add more counters"
+                            type="number"
+                            name="from"
+                            hintText=""
+                            floatingLabelText="From"
+                            onChange={(e) => {this.setState({from: e.target.value})}}
+                        /><br/>
+                        <TextField
+                            type="number"
+                            name="till"
+                            hintText=""
+                            floatingLabelText="Till"
+                            onChange={(e) => {this.setState({till: e.target.value})}}
                         />
-                        <FlatButton primary={true} onMouseUp={this.search} label="Add"/>
-                    </ListItem>
-                    <Divider />
-                    <Subheader>Sound</Subheader>
-                    <ListItem><VolumeLevel volume={this.props.volume} cb={this.setVolume} /></ListItem>
-                </List>
-            </div>
+                    </Dialog>
+                </ListItem>
+                <ListItem
+                    primaryText="Clear All"
+                    secondaryText="Clear All tokens"
+                    onTouchTap={this.clearTokens}
+                />
+                <Snackbar
+                    open={this.state.snackbarOpen}
+                    message="Cleared all the Tokens"
+                    autoHideDuration={2000}
+                    onRequestClose={this.snackbarModalClose}
+                />
+                <Divider />
+                <Subheader>Counters</Subheader>
+                <CounterList counters={this.props.counters} cb={this.delCounter}/>
+                <ListItem>
+                    <TextField
+                        style={{width: "70%"}} type="text"
+                        hintText="Add counters"
+                        value={this.state.counterText}
+                        onChange={(e) => {this.setState({counterText: e.target.value})}}
+                    />
+                    <FlatButton primary={true}
+                                disabled={!this.state.counterText}
+                                onTouchTap={this.addCounter}
+                                label="Add"
+                    />
+                </ListItem>
+                <Divider />
+                <Subheader>Sound</Subheader>
+                <ListItem><VolumeLevel volume={this.props.volume} cb={this.setVolume}/></ListItem>
+            </List>
         )
     }
 })
@@ -176,4 +206,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps)(TokenSettings);
+export default connect(mapStateToProps, null, null, {pure: false})(TokenSettings);

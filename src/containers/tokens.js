@@ -3,60 +3,77 @@ import {connect} from 'react-redux';
 
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
+import FlatButton from 'material-ui/FlatButton';
 import {List, ListItem} from 'material-ui/List'
+import Divider from 'material-ui/Divider';
+
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 
-let formValue = 10;
-let AddToken = React.createClass({
-	getInitialState: function(){
-		return ({formValue: formValue})
-	},
-	addNewToken: function(e){
-		console.log('add new token', this.state);
-	},
-	render: function(){
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-		let style = {width: "92%"};
-		return (
-			<div>
-				<TextField style={style}  type="text" hintText="Enter Token" value={this.state.formValue}/>
-				<RaisedButton  primary={true} onMouseUp={this.addNewToken} icon={<AddIcon />} />
-			</div>
-		)
-	}
-})
+import {addToken, delToken} from "../actions/token-settings"
 
 let TokenList = React.createClass({
-	render: function(){
-		let tokens = [];
+    render: function () {
+        let tokens = [];
+        for (let entry of this.props.tokens) {
+            tokens.push(
+                <ListItem key={entry} primaryText={entry}
+                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(this,entry)} />}
+                />
+            )
+        }
 
-		for(let entry of this.props.tokens){
-			console.log(entry)
-			tokens.push(
-					<li key={entry}>{entry}</li>
-			)
-		};
-
-		return (
-			<List>
-				<ul>
-					{tokens}
-				</ul>
-			</List>
-		)
-	}
+        return (
+            <div>
+                {tokens}
+            </div>
+        )
+    }
 })
+
+TokenList.propTypes = {
+    tokens: PropTypes.array.isRequired,
+    cb: PropTypes.func.isRequired
+};
+
+
 
 
 let Tokens = React.createClass({
-	render : function(){
-		return (
-			<div>
-				<TokenList tokens={this.props.tokens} />
-				
-			</div>
-		)
-	}
+    getInitialState: function () {
+        return ({
+            tokenText: ""
+        })
+    },
+    addToken: function () {
+        this.props.dispatch(addToken(this.state.tokenText))
+        this.state.tokenText = "";
+    },
+    delToken: function (token, e) {
+        this.props.dispatch(delToken(token))
+    },
+    render: function () {
+        return (
+            <List>
+                <ListItem>
+                    <TextField
+                        style={{width: "70%"}} type="number"
+                        hintText="Add a token"
+                        value={this.state.tokenText}
+                        onChange={(e) => {this.setState({tokenText: e.target.value})}}
+                    />
+                    <FlatButton primary={true}
+                                disabled={!this.state.tokenText}
+                                onTouchTap={this.addToken}
+                                label="Add"
+                    />
+                </ListItem>
+                <Divider />
+                <TokenList tokens={this.props.tokens} cb={this.delToken}/>
+            </List>
+        )
+    }
 })
 
 Tokens.propTypes = {
@@ -65,8 +82,6 @@ Tokens.propTypes = {
 };
 
 function mapStateToProps(state) {
-    console.log("tokens getting ")
-    console.log(state.token)
     return {
         counters: state.token.counters,
         tokens: state.token.tokens,
