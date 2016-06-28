@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {Link} from 'react-router';
 
 import {Tabs, Tab} from 'material-ui/Tabs';
-import SwipeableViews from 'react-swipeable-views';
 
 import TvIcon from 'material-ui/svg-icons/hardware/tv';
 import SettingsIcon from 'material-ui/svg-icons/action/settings';
@@ -37,38 +36,27 @@ let Layout = React.createClass({
         const {dispatch} = this.props;
     },
     getInitialState: function () {
-        return {slideIndex: 0};
+        return {value: 0};
     },
     handleChange: function(value) {
         this.setState({
-            slideIndex: value,
+            value: value
         });
     },
     render: function () {
-        let children = React.Children.map(this.props.children, (child) => {
-            return React.cloneElement(child, {toggle: this.toggle, ...child.props});
-        })
         return (
             <div>
                 <Tabs onChange={this.handleChange} value={this.state.slideIndex}>
-                    <Tab icon={<PlayIcon />} label="Tokens" value={0} />
-                    <Tab icon={<SettingsIcon />} label="Settings" value={1} />
-                    <Tab icon={<TvIcon />} label="Displays" value={2} />
-                </Tabs>
-                <SwipeableViews
-                    index={this.state.slideIndex}
-                    onChangeIndex={this.handleChange}
-                >
-                    <div>
-                        <Tokens />
-                    </div>
-                    <div >
+                    <Tab icon={<PlayIcon />} label="Tokens" value={0}>
+                        <Tokens/>
+                    </Tab>
+                    <Tab icon={<SettingsIcon />} label="Settings" value={1}>
                         <TokenSettings/>
-                    </div>
-                    <div >
-                        <Players />
-                    </div>
-                </SwipeableViews>
+                    </Tab>
+                    <Tab icon={<TvIcon />} label="Displays" value={2} >
+                        <Players/>
+                    </Tab>
+                </Tabs>
             </div>
         );
     }
