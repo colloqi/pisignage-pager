@@ -18,3 +18,6 @@ Progressive web app for piSignage token display and paging application
 
 #Todo
 1. sw-toolbox-config.js to be modified
+2. Add player username/password
+3. pi integration
+4. Player Tab

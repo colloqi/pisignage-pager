@@ -1,5 +1,5 @@
 import {combineReducers} from 'redux';
-import server from './server';
+import token from './token';
 import {routerReducer} from 'react-router-redux';
 
 /**
@@ -16,7 +16,7 @@ import {routerReducer} from 'react-router-redux';
  * More info: http://rackt.org/redux/docs/api/combineReducers.html
  */
 const rootReducer = combineReducers({
-    server,
+    token,
     routing: routerReducer
 });
 
