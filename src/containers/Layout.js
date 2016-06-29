@@ -24,7 +24,7 @@ import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 import urls from '../constants/urls';
 
-import Players from  '../components/players';
+import Players from  './players';
 import TokenSettings from './token-settings';
 import Tokens from './tokens';
 

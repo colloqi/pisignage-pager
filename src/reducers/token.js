@@ -2,6 +2,7 @@ import * as actionTypes from '../constants/ActionTypes';
 
 let initState = {
     volume: 5,
+    players: [],
     tokens: [],
     counters: []
 }
@@ -28,6 +29,13 @@ export default function reducer(state = initState, action) {
                 return action.token != itm;
             });
             return Object.assign({}, state, {tokens: tokens})
+        case actionTypes.ADD_PLAYER:
+            return Object.assign({}, state, {players: state.players.concat(action.player)})
+        case actionTypes.DEL_PLAYER:
+            var players = state.players.filter(function(itm){
+                return action.player != itm;
+            });
+            return Object.assign({}, state, {players: players})
         default:
             return state;
     }

@@ -11,7 +11,7 @@ import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {addToken, delToken} from "../actions/token-settings"
+import {addToken, delToken} from "../actions/token"
 
 let TokenList = React.createClass({
     render: function () {
@@ -69,7 +69,6 @@ let Tokens = React.createClass({
                                 label="Add"
                     />
                 </ListItem>
-                <Divider />
                 <TokenList tokens={this.props.tokens} cb={this.delToken}/>
             </List>
         )
