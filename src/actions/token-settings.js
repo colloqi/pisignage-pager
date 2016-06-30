@@ -52,7 +52,7 @@ export function delToken(token) {
 
 export function setUser(credentials) {
     window.localStorage.credentials = JSON.stringify(credentials)
-    var token = 'Basic '+btoa($scope.credentials.username+':'+$scope.credentials.password);
+    var token = 'Basic '+btoa(credentials.username+':'+credentials.password);
     window.localStorage.TOKEN = token;
     return {
         type: actionTypes.SET_USER,
