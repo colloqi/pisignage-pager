@@ -14,7 +14,7 @@ import Slider from 'material-ui/Slider';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {clearTokens, generateTokens, setVolume, addCounter, delCounter} from "../actions/token-settings"
+import {clearTokens, generateTokens, setVolume, addCounter, delCounter,setUser} from "../actions/token-settings"
 
 let VolumeLevel = React.createClass({
 
@@ -112,6 +112,9 @@ let TokenSettings = React.createClass({
     setVolume: function (value) {
         this.props.dispatch(setVolume(value))
     },
+    saveUser: function() {
+        this.props.dispatch(setUser(this.props.credentials))
+    },
     render: function () {
         const modelActions = [
             <FlatButton
@@ -187,6 +190,36 @@ let TokenSettings = React.createClass({
                 <Divider />
                 <Subheader>Sound</Subheader>
                 <ListItem><VolumeLevel volume={this.props.volume} cb={this.setVolume}/></ListItem>
+                <Divider />
+                <Subheader>Player Credentials</Subheader>
+                <ListItem>
+                    <TextField
+                        style={{width: "70%"}}
+                        type="text"
+                        name="user"
+                        hintText=""
+                        floatingLabelText="User Name"
+                        value={this.props.credentials.user}
+                        onChange={(e) => {this.props.credentials.user = e.target.value}}
+                    />
+                </ListItem>
+                <ListItem>
+                    <TextField
+                        style={{width: "70%"}}
+                        type="password"
+                        name="password"
+                        hintText=""
+                        floatingLabelText="Password"
+                        value={this.props.credentials.password}
+                        onChange={(e) => {this.props.credentials.password = e.target.value}}
+                    />
+                    <FlatButton primary={true}
+                                disabled={!this.props.credentials.user || !this.props.credentials.password}
+                                onTouchTap={this.saveUser}
+                                label="Save"
+                    />
+                </ListItem>
+
             </List>
         )
     }
@@ -194,6 +227,7 @@ let TokenSettings = React.createClass({
 
 TokenSettings.propTypes = {
     volume: PropTypes.number.isRequired,
+    credentials: PropTypes.object.isRequired,
     counters: PropTypes.array.isRequired,
     tokens: PropTypes.array.isRequired
 };
@@ -201,6 +235,7 @@ TokenSettings.propTypes = {
 function mapStateToProps(state) {
     return {
         volume: state.token.volume,
+        credentials: state.token.credentials,
         counters: state.token.counters,
         tokens: state.token.tokens,
     };

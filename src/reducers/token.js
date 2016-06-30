@@ -1,7 +1,13 @@
 import * as actionTypes from '../constants/ActionTypes';
 
+var cred = {user: "pi", password: "pi"}
+if (window.localStorage.credentials) {
+    cred = JSON.parse(window.localStorage.credentials)
+}
+
 let initState = {
     volume: 5,
+    credentials: cred,
     players: [],
     tokens: [],
     counters: []
@@ -36,6 +42,8 @@ export default function reducer(state = initState, action) {
                 return action.player != itm;
             });
             return Object.assign({}, state, {players: players})
+        case actionTypes.SET_USER:
+            return Object.assign({}, state, {credentials: action.credentials})
         default:
             return state;
     }

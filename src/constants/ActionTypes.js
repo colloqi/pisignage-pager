@@ -15,3 +15,6 @@ export const DEL_TOKEN = 'DEL_TOKEN';
 
 export const ADD_PLAYER = 'ADD_PLAYER';
 export const DEL_PLAYER = 'DEL_PLAYER';
+
+export const SET_USER = 'SET_USER';
+
