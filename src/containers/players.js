@@ -51,12 +51,6 @@ let Players = React.createClass({
             endip: this.props.lan.endip
         })
     },
-    componentWillReceiveProps: function (newProps) {
-        this.setState({
-            startip: this.props.lan.startip,
-            endip: this.props.lan.endip
-        })
-    },
     displayModalOpen: function () {
         this.setState({modalOpen: true});
     },
@@ -123,7 +117,7 @@ let Players = React.createClass({
                         hintText="192.168.1.1"
                         value={this.state.startip}
                         floatingLabelText="Start Address"
-                        onChange={(e) => {this.state.startip = e.target.value}}
+                        onChange={(e) => {this.setState({startip: e.target.value})}}
                     />
                     <TextField
                         type="text"
@@ -131,7 +125,7 @@ let Players = React.createClass({
                         hintText="254"
                         value={this.state.endip}
                         floatingLabelText="Till"
-                        onChange={(e) => {this.state.endip = e.target.value}}
+                        onChange={(e) => {this.setState({endip: e.target.value})}}
                     />
                 </Dialog>
             </div>

@@ -14,7 +14,7 @@ import SkipNext from 'material-ui/svg-icons/av/skip-next';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {addToken,showToken, delToken} from "../actions/token"
+import {addToken, showToken, delToken} from "../actions/token"
 
 const style = {
     bottom: 20,
@@ -42,8 +42,8 @@ let TokenList = React.createClass({
             let props = {
                 key: entry,
                 primaryText: <h1>{entry}</h1>,
-                onTouchTap: this.props.cbShow.bind(null,entry),
-                rightIcon:  <DeleteIcon onTouchTap={this.props.cbDelete.bind(null,entry)} />
+                onTouchTap: this.props.cbShow.bind(null, entry),
+                rightIcon: <DeleteIcon onTouchTap={this.props.cbDelete.bind(null,entry)}/>
             }
             if (this.props.selectedToken == entry) {
                 props.secondaryText = "Now Showing"
@@ -69,8 +69,6 @@ TokenList.propTypes = {
 };
 
 
-
-
 let Tokens = React.createClass({
     getInitialState: function () {
         return ({
@@ -80,17 +78,24 @@ let Tokens = React.createClass({
     },
     addToken: function () {
         this.props.dispatch(addToken(this.state.tokenText))
-        this.setState({tokenText : ""});
+        this.setState({tokenText: ""});
     },
     showToken: function (token, e) {
-        this.setState({selectedToken:token})
+        this.setState({selectedToken: token})
         this.props.dispatch(showToken(token))
     },
     showNextToken: function () {
         const index = this.props.tokens.indexOf(this.state.selectedToken)
-        if (index < (this.props.tokens.length-1))
-            this.setState({selectedToken:this.props.tokens[index +1]})
-        this.props.dispatch(showToken(this.state.selectedToken))
+        let nextToken;
+        if (index == -1) {
+            nextToken = this.props.tokens[0];
+        } else if (index < (this.props.tokens.length - 1)) {
+            nextToken = this.props.tokens[index + 1];
+        } else {
+            return;
+        }
+        this.setState({selectedToken: nextToken})
+        this.props.dispatch(showToken(nextToken))
     },
     delToken: function (token, e) {
         this.props.dispatch(delToken(token))
@@ -116,12 +121,13 @@ let Tokens = React.createClass({
                            cbShow={this.showToken}
                            cbDelete={this.delToken}
                 />
-                {this.props.showFloatingButton?<FloatingActionButton
-                    style={style}
-                    onTouchTap={this.showNextToken}
-                >
-                    <SkipNext />
-                </FloatingActionButton>:null}
+                {this.props.showFloatingButton?
+                    <FloatingActionButton
+                        style={style}
+                        onTouchTap={this.showNextToken}
+                    >
+                        <SkipNext />
+                    </FloatingActionButton> : null}
             </List>
         )
     }

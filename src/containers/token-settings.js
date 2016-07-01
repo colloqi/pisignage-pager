@@ -81,15 +81,6 @@ let TokenSettings = React.createClass({
             till: this.props.counter.till
         })
     },
-    componentWillReceiveProps: function (newProps) {
-        this.setState({
-            volume: this.props.sound.volume,
-            user: this.props.credentials.user,
-            password: this.props.credentials.password,
-            from: this.props.counter.from,
-            till: this.props.counter.till
-        })
-    },
     displayModalOpen: function () {
         this.setState({modalOpen: true});
     },
