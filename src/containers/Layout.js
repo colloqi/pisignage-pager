@@ -36,7 +36,7 @@ let Layout = React.createClass({
         const {dispatch} = this.props;
     },
     getInitialState: function () {
-        return {value: 0};
+        return {value: "tokens"};
     },
     handleChange: function(value) {
         this.setState({
@@ -44,16 +44,17 @@ let Layout = React.createClass({
         });
     },
     render: function () {
+        const showFloatingButton = (this.state.value == "tokens")
         return (
             <div>
                 <Tabs onChange={this.handleChange} value={this.state.slideIndex}>
-                    <Tab icon={<PlayIcon />} label="Tokens" value={0}>
-                        <Tokens/>
+                    <Tab icon={<PlayIcon />} label="Tokens" value={"tokens"}>
+                        <Tokens showFloatingButton={showFloatingButton}/>
                     </Tab>
-                    <Tab icon={<SettingsIcon />} label="Settings" value={1}>
+                    <Tab icon={<SettingsIcon />} label="Settings" value={"settings"}>
                         <TokenSettings/>
                     </Tab>
-                    <Tab icon={<TvIcon />} label="Displays" value={2} >
+                    <Tab icon={<TvIcon />} label="Displays" value={"players"} >
                         <Players/>
                     </Tab>
                 </Tabs>

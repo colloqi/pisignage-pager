@@ -50,7 +50,7 @@ let CounterList = React.createClass({
         for (let entry of this.props.counters) {
             counters.push(
                 <ListItem key={entry} primaryText={entry}
-                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(this,entry)} />
+                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(null,entry)} />
                 }/>
             )
         }

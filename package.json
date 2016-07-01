@@ -29,6 +29,7 @@
     "react-redux": "^4.4.5",
     "react-router": "^2.5.1",
     "react-router-redux": "^4.0.5",
+    "react-swipeable": "^3.5.0",
     "react-swipeable-views": "^0.6.2",
     "react-tap-event-plugin": "^1.0.0",
     "redux": "^3.5.2",

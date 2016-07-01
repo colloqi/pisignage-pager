@@ -1,26 +1,56 @@
 import React, {Component, PropTypes} from 'react';
+import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 
 import TextField from 'material-ui/TextField'
 import RaisedButton from 'material-ui/RaisedButton'
 import FlatButton from 'material-ui/FlatButton';
+import FloatingActionButton from 'material-ui/FloatingActionButton';
 import {List, ListItem} from 'material-ui/List'
 import Divider from 'material-ui/Divider';
 
 import AddIcon from 'material-ui/svg-icons/content/add-circle-outline';
+import SkipNext from 'material-ui/svg-icons/av/skip-next';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {addToken, delToken} from "../actions/token"
+import {addToken,showToken, delToken} from "../actions/token"
+
+const style = {
+    bottom: 20,
+    right: 20,
+    position: "fixed"
+};
+
 
 let TokenList = React.createClass({
+    componentDidUpdate(prevProps) {
+        if (this.props.selectedToken !== prevProps.selectedToken) {
+            this.scrollToTop();
+        }
+    },
+    scrollToTop() {
+        var itemComponent = this.refs.active;
+        if (itemComponent) {
+            var domNode = ReactDOM.findDOMNode(itemComponent);
+            domNode.scrollIntoView(true)
+        }
+    },
     render: function () {
         let tokens = [];
         for (let entry of this.props.tokens) {
+            let props = {
+                key: entry,
+                primaryText: <h1>{entry}</h1>,
+                onTouchTap: this.props.cbShow.bind(null,entry),
+                rightIcon:  <DeleteIcon onTouchTap={this.props.cbDelete.bind(null,entry)} />
+            }
+            if (this.props.selectedToken == entry) {
+                props.secondaryText = "Now Showing"
+                props.ref = "active"
+            }
             tokens.push(
-                <ListItem key={entry} primaryText={entry}
-                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(this,entry)} />}
-                />
+                <ListItem {...props} />
             )
         }
 
@@ -34,7 +64,8 @@ let TokenList = React.createClass({
 
 TokenList.propTypes = {
     tokens: PropTypes.array.isRequired,
-    cb: PropTypes.func.isRequired
+    cbShow: PropTypes.func.isRequired,
+    cbDelete: PropTypes.func.isRequired
 };
 
 
@@ -43,12 +74,23 @@ TokenList.propTypes = {
 let Tokens = React.createClass({
     getInitialState: function () {
         return ({
-            tokenText: ""
+            tokenText: "",
+            selectedToken: this.props.selectedToken
         })
     },
     addToken: function () {
         this.props.dispatch(addToken(this.state.tokenText))
         this.setState({tokenText : ""});
+    },
+    showToken: function (token, e) {
+        this.setState({selectedToken:token})
+        this.props.dispatch(showToken(token))
+    },
+    showNextToken: function () {
+        const index = this.props.tokens.indexOf(this.state.selectedToken)
+        if (index < (this.props.tokens.length-1))
+            this.setState({selectedToken:this.props.tokens[index +1]})
+        this.props.dispatch(showToken(this.state.selectedToken))
     },
     delToken: function (token, e) {
         this.props.dispatch(delToken(token))
@@ -69,7 +111,17 @@ let Tokens = React.createClass({
                                 label="Add"
                     />
                 </ListItem>
-                <TokenList tokens={this.props.tokens} cb={this.delToken}/>
+                <TokenList tokens={this.props.tokens}
+                           selectedToken={this.props.selectedToken}
+                           cbShow={this.showToken}
+                           cbDelete={this.delToken}
+                />
+                {this.props.showFloatingButton?<FloatingActionButton
+                    style={style}
+                    onTouchTap={this.showNextToken}
+                >
+                    <SkipNext />
+                </FloatingActionButton>:null}
             </List>
         )
     }
@@ -84,6 +136,7 @@ function mapStateToProps(state) {
     return {
         counters: state.token.counters,
         tokens: state.token.tokens,
+        selectedToken: state.token.selectedToken
     };
 }
 

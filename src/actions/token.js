@@ -9,6 +9,13 @@ export function addToken(token) {
     }
 }
 
+export function showToken(token) {
+    return {
+        type: actionTypes.SHOW_TOKEN,
+        token
+    }
+}
+
 export function delToken(token) {
     return {
         type: actionTypes.DEL_TOKEN,

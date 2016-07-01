@@ -22,7 +22,7 @@ let PlayerList = React.createClass({
         for (let entry of this.props.players) {
             players.push(
                 <ListItem key={entry} primaryText={entry}
-                          leftIcon={<DeleteIcon onTouchTap={this.props.cb.bind(this,entry)} />}
+                          leftIcon={<DeleteIcon onTouchTap={this.props.cb.bind(null,entry)} />}
                           rightToggle={<Toggle />}
                 />
             )
@@ -47,6 +47,12 @@ let Players = React.createClass({
         return ({
             playerText: "",
             modalOpen: false,
+            startip: this.props.lan.startip,
+            endip: this.props.lan.endip
+        })
+    },
+    componentWillReceiveProps: function (newProps) {
+        this.setState({
             startip: this.props.lan.startip,
             endip: this.props.lan.endip
         })

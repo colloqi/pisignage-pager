@@ -9,6 +9,7 @@ let initState = {
     },
     players: [],
     tokens: [],
+    selectedToken: null,
     counters: []
 }
 
@@ -31,6 +32,8 @@ export default function reducer(state = initState, action) {
             return Object.assign({}, state, {counters: counters})
         case actionTypes.ADD_TOKEN:
             return Object.assign({}, state, {tokens: state.tokens.concat(action.token)})
+        case actionTypes.SHOW_TOKEN:
+            return Object.assign({}, state, {selectedToken: action.token})
         case actionTypes.DEL_TOKEN:
             var tokens = state.tokens.filter(function (itm) {
                 return action.token != itm;

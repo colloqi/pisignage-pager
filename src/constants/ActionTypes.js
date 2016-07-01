@@ -12,6 +12,7 @@ export const DEL_COUNTER = 'DEL_COUNTER';
 
 export const ADD_TOKEN = 'ADD_TOKEN';
 export const DEL_TOKEN = 'DEL_TOKEN';
+export const SHOW_TOKEN = 'SHOW_TOKEN';
 
 export const ADD_PLAYER = 'ADD_PLAYER';
 export const DEL_PLAYER = 'DEL_PLAYER';
