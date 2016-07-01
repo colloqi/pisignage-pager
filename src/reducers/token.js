@@ -1,13 +1,12 @@
 import * as actionTypes from '../constants/ActionTypes';
 
-var cred = {user: "pi", password: "pi"}
-if (window.localStorage.credentials) {
-    cred = JSON.parse(window.localStorage.credentials)
-}
-
 let initState = {
-    volume: 5,
-    credentials: cred,
+    settings: {
+        sound:{volume: 5},
+        lan: {startip: "192.168.1.1", endip: "10"},
+        credentials: {user: "pi", password: "pi", token:""},
+        counter: {from:1,till:100}
+    },
     players: [],
     tokens: [],
     counters: []
@@ -16,7 +15,9 @@ let initState = {
 export default function reducer(state = initState, action) {
     switch (action.type) {
         case actionTypes.SET_VOLUME:
-            return Object.assign({}, state, {volume: action.volume})
+            var newstate = Object.assign({}, state)
+            newstate.settings.sound.volume = action.volume
+            return newstate
         case actionTypes.CLEAR_TOKENS:
             return Object.assign({}, state, {tokens: []})
         case actionTypes.GENERATE_TOKENS:
@@ -24,26 +25,28 @@ export default function reducer(state = initState, action) {
         case actionTypes.ADD_COUNTER:
             return Object.assign({}, state, {counters: state.counters.concat(action.counter)})
         case actionTypes.DEL_COUNTER:
-            var counters = state.counters.filter(function(itm){
+            var counters = state.counters.filter(function (itm) {
                 return action.counter != itm;
             });
             return Object.assign({}, state, {counters: counters})
         case actionTypes.ADD_TOKEN:
             return Object.assign({}, state, {tokens: state.tokens.concat(action.token)})
         case actionTypes.DEL_TOKEN:
-            var tokens = state.tokens.filter(function(itm){
+            var tokens = state.tokens.filter(function (itm) {
                 return action.token != itm;
             });
             return Object.assign({}, state, {tokens: tokens})
         case actionTypes.ADD_PLAYER:
             return Object.assign({}, state, {players: state.players.concat(action.player)})
         case actionTypes.DEL_PLAYER:
-            var players = state.players.filter(function(itm){
+            var players = state.players.filter(function (itm) {
                 return action.player != itm;
             });
             return Object.assign({}, state, {players: players})
         case actionTypes.SET_USER:
-            return Object.assign({}, state, {credentials: action.credentials})
+            var newstate = Object.assign({}, state)
+            newstate.settings.credentials = action.credentials
+            return newstate
         default:
             return state;
     }

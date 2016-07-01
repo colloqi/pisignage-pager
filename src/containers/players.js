@@ -5,8 +5,11 @@ import Toggle from 'material-ui/Toggle'
 
 import TextField from 'material-ui/TextField'
 import FlatButton from 'material-ui/FlatButton';
+import RaisedButton from 'material-ui/RaisedButton'
 import IconButton from 'material-ui/IconButton';
 import {List, ListItem} from 'material-ui/List'
+
+import Dialog from 'material-ui/Dialog';
 
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
@@ -42,39 +45,90 @@ PlayerList.propTypes = {
 let Players = React.createClass({
     getInitialState: function () {
         return ({
-            playerText: ""
+            playerText: "",
+            modalOpen: false,
+            startip: this.props.lan.startip,
+            endip: this.props.lan.endip
         })
     },
+    displayModalOpen: function () {
+        this.setState({modalOpen: true});
+    },
+    displayModalClose: function () {
+        this.setState({modalOpen: false});
+    },
     addPlayer: function () {
-        console.log("adding Player")
         this.props.dispatch(addPlayer(this.state.playerText))
-        this.state.playerText = "";
+        this.setState({playerText: ""});
     },
     delPlayer: function (player, e) {
         this.props.dispatch(delPlayer(player))
     },
+    scanNetwork: function() {
+        this.props.dispatch(scanNetwork(this.state.startip, this.state.endip))
+        this.displayModalClose()    
+    },
     render: function () {
+        const modelActions = [
+            <FlatButton
+                label="Cancel"
+                secondary={true}
+                onTouchTap={this.displayModalClose}
+            />,
+            <RaisedButton
+                label="Scan"
+                primary={true}
+                onTouchTap={this.scanNetwork}
+            />
+        ];
+
         return (
-            <List>
-                <ListItem>
+            <div>
+                <List>
+                    <ListItem>
+                        <TextField
+                            style={{width: "60%"}} type="text"
+                            hintText="Add a player IP"
+                            value={this.state.playerText}
+                            onChange={(e) => {this.setState({playerText: e.target.value})}}
+                        />
+                        <FlatButton primary={true}
+                                    disabled={!this.state.playerText}
+                                    onTouchTap={this.addPlayer}
+                                    primary={true}
+                                    label="Add"
+                        />
+                        <IconButton onTouchTap={this.displayModalOpen}>
+                            <RefreshIcon />
+                        </IconButton>
+                    </ListItem>
+                    <PlayerList players={this.props.players} cb={this.delPlayer}/>
+                </List>
+                <Dialog
+                    title="Select Address Range"
+                    actions={modelActions}
+                    modal={false}
+                    open={this.state.modalOpen}
+                    onRequestClose={this.displayModalClose}
+                >
                     <TextField
-                        style={{width: "60%"}} type="text"
-                        hintText="Add a player IP"
-                        value={this.state.playerText}
-                        onChange={(e) => {this.setState({playerText: e.target.value})}}
+                        type="text"
+                        name="startip"
+                        hintText="192.168.1.1"
+                        value={this.state.startip}
+                        floatingLabelText="Start Address"
+                        onChange={(e) => {this.state.startip = e.target.value}}
                     />
-                    <FlatButton primary={true}
-                                disabled={!this.state.playerText}
-                                onTouchTap={this.addPlayer}
-                                primary={true}
-                                label="Add"
+                    <TextField
+                        type="text"
+                        name="endip"
+                        hintText="254"
+                        value={this.state.endip}
+                        floatingLabelText="Till"
+                        onChange={(e) => {this.state.endip = e.target.value}}
                     />
-                    <IconButton>
-                        {<RefreshIcon onTouchTap={this.addPlayer}/>}
-                    </IconButton>
-                </ListItem>
-                <PlayerList players={this.props.players} cb={this.delPlayer}/>
-            </List>
+                </Dialog>
+            </div>
         )
     }
 })
@@ -86,6 +140,7 @@ Players.propTypes = {
 function mapStateToProps(state) {
     return {
         players: state.token.players,
+        lan: state.token.settings.lan
     };
 }
 

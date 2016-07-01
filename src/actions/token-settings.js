@@ -50,17 +50,14 @@ export function delToken(token) {
     }
 }
 
-export function setUser(credentials) {
-    window.localStorage.credentials = JSON.stringify(credentials)
-    var token = 'Basic '+btoa(credentials.username+':'+credentials.password);
-    window.localStorage.TOKEN = token;
+export function setUser(user,password) {
+    var token = 'Basic '+btoa(user+':'+password);
     return {
         type: actionTypes.SET_USER,
-        credentials
+        credentials: {user:user,password:password},
+        token
     }
 }
-
-
 
 export function fetchUrl(options) {
     return (dispatch,getState) => {

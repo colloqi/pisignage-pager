@@ -1,6 +1,7 @@
 import {createStore, applyMiddleware, compose} from 'redux';
 import rootReducer from '../reducers';
 import thunkMiddleware from 'redux-thunk';
+import persistState from 'redux-localstorage'
 import createLogger from 'redux-logger';
 import DevTools from '../containers/DevTools';
 
@@ -13,6 +14,7 @@ import DevTools from '../containers/DevTools';
 const finalCreateStore = compose(
     // Middleware you want to use in development:
     applyMiddleware(thunkMiddleware, createLogger()),
+    persistState(null,{"key":"pager"}),
     // Required! Enable Redux DevTools with the monitors you chose
     DevTools.instrument()
 )(createStore);

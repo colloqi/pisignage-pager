@@ -48,7 +48,7 @@ let Tokens = React.createClass({
     },
     addToken: function () {
         this.props.dispatch(addToken(this.state.tokenText))
-        this.state.tokenText = "";
+        this.setState({tokenText : ""});
     },
     delToken: function (token, e) {
         this.props.dispatch(delToken(token))

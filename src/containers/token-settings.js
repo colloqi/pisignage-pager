@@ -14,7 +14,7 @@ import Slider from 'material-ui/Slider';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {clearTokens, generateTokens, setVolume, addCounter, delCounter,setUser} from "../actions/token-settings"
+import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser} from "../actions/token-settings"
 
 let VolumeLevel = React.createClass({
 
@@ -74,8 +74,20 @@ let TokenSettings = React.createClass({
             modalOpen: false,
             snackbarOpen: false,
             counterText: "",
-            from: 1,
-            till: 100
+            volume: this.props.sound.volume,
+            user: this.props.credentials.user,
+            password: this.props.credentials.password,
+            from: this.props.counter.from,
+            till: this.props.counter.till
+        })
+    },
+    componentWillReceiveProps: function (newProps) {
+        this.setState({
+            volume: this.props.sound.volume,
+            user: this.props.credentials.user,
+            password: this.props.credentials.password,
+            from: this.props.counter.from,
+            till: this.props.counter.till
         })
     },
     displayModalOpen: function () {
@@ -104,16 +116,17 @@ let TokenSettings = React.createClass({
     },
     addCounter: function () {
         this.props.dispatch(addCounter(this.state.counterText))
-        this.state.counterText = "";
+        this.setState({counterText: ""});
     },
     delCounter: function (counter, e) {
         this.props.dispatch(delCounter(counter))
     },
     setVolume: function (value) {
+        this.setState({volume:value})
         this.props.dispatch(setVolume(value))
     },
-    saveUser: function() {
-        this.props.dispatch(setUser(this.props.credentials))
+    saveUser: function () {
+        this.props.dispatch(setUser(this.state.user,this.state.password))
     },
     render: function () {
         const modelActions = [
@@ -130,114 +143,117 @@ let TokenSettings = React.createClass({
         ];
 
         return (
-            <List>
-                <Subheader>Token Settings</Subheader>
-                <ListItem
-                    primaryText="Generate Tokens"
-                    secondaryText="Creates tokens between 2 values"
-                    onTouchTap={this.displayModalOpen}
-                >
-                    <Dialog
-                        title="Auto Generate"
-                        actions={modelActions}
-                        modal={false}
-                        open={this.state.modalOpen}
-                        onRequestClose={this.displayModalClose}
-                    >
+            <div>
+                <List>
+                    <Subheader>Token Settings</Subheader>
+                    <ListItem
+                        primaryText="Generate Tokens"
+                        secondaryText="Creates tokens between 2 values"
+                        onTouchTap={this.displayModalOpen}
+                    />
+                    <ListItem
+                        primaryText="Clear All"
+                        secondaryText="Clear All tokens"
+                        onTouchTap={this.clearTokens}
+                    />
+                    <Divider />
+                    <Subheader>Counters</Subheader>
+                    <CounterList counters={this.props.counters} cb={this.delCounter}/>
+                    <ListItem>
                         <TextField
-                            type="number"
-                            name="from"
-                            hintText=""
-                            floatingLabelText="From"
-                            onChange={(e) => {this.setState({from: e.target.value})}}
-                        /><br/>
-                        <TextField
-                            type="number"
-                            name="till"
-                            hintText=""
-                            floatingLabelText="Till"
-                            onChange={(e) => {this.setState({till: e.target.value})}}
+                            style={{width: "70%"}} type="text"
+                            hintText="Add counters"
+                            value={this.state.counterText}
+                            onChange={(e) => {this.setState({counterText: e.target.value})}}
                         />
-                    </Dialog>
-                </ListItem>
-                <ListItem
-                    primaryText="Clear All"
-                    secondaryText="Clear All tokens"
-                    onTouchTap={this.clearTokens}
-                />
+                        <FlatButton primary={true}
+                                    disabled={!this.state.counterText}
+                                    onTouchTap={this.addCounter}
+                                    label="Add"
+                        />
+                    </ListItem>
+                    <Divider />
+                    <Subheader>Sound</Subheader>
+                    <ListItem><VolumeLevel volume={this.state.volume} cb={this.setVolume}/></ListItem>
+                    <Divider />
+                    <Subheader>Player Credentials</Subheader>
+                    <ListItem>
+                        <TextField
+                            style={{width: "70%"}}
+                            type="text"
+                            name="user"
+                            hintText=""
+                            floatingLabelText="User Name"
+                            value={this.state.user}
+                            onChange={(e) => {this.setState({user: e.target.value})}}
+                        />
+                    </ListItem>
+                    <ListItem>
+                        <TextField
+                            style={{width: "70%"}}
+                            type="password"
+                            name="password"
+                            hintText=""
+                            floatingLabelText="Password"
+                            value={this.state.password}
+                            onChange={(e) => {this.setState({password: e.target.value})}}
+                        />
+                        <FlatButton primary={true}
+                                    disabled={!this.state.user || !this.state.password}
+                                    onTouchTap={this.saveUser}
+                                    label="Save"
+                        />
+                    </ListItem>
+
+                </List>
+                <Dialog
+                    title="Auto Generate"
+                    actions={modelActions}
+                    modal={false}
+                    open={this.state.modalOpen}
+                    onRequestClose={this.displayModalClose}
+                >
+                    <TextField
+                        type="number"
+                        name="from"
+                        hintText=""
+                        floatingLabelText="From"
+                        value= {this.state.from}
+                        onChange={(e) => {this.setState({from: e.target.value})}}
+                    /><br/>
+                    <TextField
+                        type="number"
+                        name="till"
+                        hintText=""
+                        floatingLabelText="Till"
+                        value= {this.state.till}
+                        onChange={(e) => {this.setState({till: e.target.value})}}
+                    />
+                </Dialog>
                 <Snackbar
                     open={this.state.snackbarOpen}
                     message="Cleared all the Tokens"
                     autoHideDuration={2000}
                     onRequestClose={this.snackbarModalClose}
                 />
-                <Divider />
-                <Subheader>Counters</Subheader>
-                <CounterList counters={this.props.counters} cb={this.delCounter}/>
-                <ListItem>
-                    <TextField
-                        style={{width: "70%"}} type="text"
-                        hintText="Add counters"
-                        value={this.state.counterText}
-                        onChange={(e) => {this.setState({counterText: e.target.value})}}
-                    />
-                    <FlatButton primary={true}
-                                disabled={!this.state.counterText}
-                                onTouchTap={this.addCounter}
-                                label="Add"
-                    />
-                </ListItem>
-                <Divider />
-                <Subheader>Sound</Subheader>
-                <ListItem><VolumeLevel volume={this.props.volume} cb={this.setVolume}/></ListItem>
-                <Divider />
-                <Subheader>Player Credentials</Subheader>
-                <ListItem>
-                    <TextField
-                        style={{width: "70%"}}
-                        type="text"
-                        name="user"
-                        hintText=""
-                        floatingLabelText="User Name"
-                        value={this.props.credentials.user}
-                        onChange={(e) => {this.props.credentials.user = e.target.value}}
-                    />
-                </ListItem>
-                <ListItem>
-                    <TextField
-                        style={{width: "70%"}}
-                        type="password"
-                        name="password"
-                        hintText=""
-                        floatingLabelText="Password"
-                        value={this.props.credentials.password}
-                        onChange={(e) => {this.props.credentials.password = e.target.value}}
-                    />
-                    <FlatButton primary={true}
-                                disabled={!this.props.credentials.user || !this.props.credentials.password}
-                                onTouchTap={this.saveUser}
-                                label="Save"
-                    />
-                </ListItem>
-
-            </List>
+            </div>
         )
     }
 })
 
 TokenSettings.propTypes = {
-    volume: PropTypes.number.isRequired,
+    sound: PropTypes.object.isRequired,
     credentials: PropTypes.object.isRequired,
-    counters: PropTypes.array.isRequired,
-    tokens: PropTypes.array.isRequired
+    counter: PropTypes.object.isRequired,
+    counters: PropTypes.array.isRequired
 };
 
 function mapStateToProps(state) {
     return {
-        volume: state.token.volume,
-        credentials: state.token.credentials,
-        counters: state.token.counters,
-        tokens: state.token.tokens,
+        sound: state.token.settings.sound,
+        credentials: state.token.settings.credentials,
+        counter: state.token.settings.counter,
+        counters: state.token.counters
     };
 }
 
