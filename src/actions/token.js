@@ -9,10 +9,11 @@ export function addToken(token) {
     }
 }
 
-export function showToken(token) {
+export function showToken(token,counter) {
     return {
         type: actionTypes.SHOW_TOKEN,
-        token
+        token,
+        counter
     }
 }
 
