@@ -14,7 +14,7 @@ import Dialog from 'material-ui/Dialog';
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {addPlayer, delPlayer, enablePlayer} from "../actions/player"
+import {checkPlayer, delPlayer, updatePlayer} from "../actions/player"
 
 let PlayerList = React.createClass({
     render: function () {
@@ -59,15 +59,16 @@ let Players = React.createClass({
         this.setState({modalOpen: false});
     },
     addPlayer: function () {
-        this.props.dispatch(addPlayer(this.state.playerText))
+        this.props.dispatch(checkPlayer(this.state.playerText))
         this.setState({playerText: ""});
     },
     delPlayer: function (player, e) {
-        this.props.dispatch(delPlayer(player.ip))
+        this.props.dispatch(delPlayer(player))
     },
     enablePlayer: function (player, e) {
+        e.stopPropagation();
         player.enabled = !player.enabled
-        this.props.dispatch(enablePlayer(player.ip, player.enabled))
+        this.props.dispatch(updatePlayer(player))
     },
     scanNetwork: function() {
         this.props.dispatch(scanNetwork(this.state.startip, this.state.endip))

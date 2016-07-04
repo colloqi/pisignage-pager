@@ -4,7 +4,7 @@ let initState = {
     settings: {
         sound:{volume: 5},
         lan: {startip: "192.168.1.1", endip: "10"},
-        credentials: {user: "pi", password: "pi", token:""},
+        credentials: {user: "pi", password: "pi", token:"Basic cGk6cGk="},
         counter: {from:1,till:100}
     },
     players: [],
@@ -43,22 +43,17 @@ export default function reducer(state = initState, action) {
             });
             return Object.assign({}, state, {tokens: tokens})
         case actionTypes.ADD_PLAYER:
-            let newPlayer = {
-                ip:action.ip,
-                enabled: true,
-                name: ""
-            }
-            return Object.assign({}, state, {players: state.players.concat(newPlayer)})
-        case actionTypes.ENABLE_PLAYER:
+            return Object.assign({}, state, {players: state.players.concat(action.player)})
+        case actionTypes.UPDATE_PLAYER:
             var newPlayers = state.players.slice()
             var player = newPlayers.find(function(player) {
-                return player.ip === action.ip;
+                return player.ip === action.player.ip;
             })
-            player.enabled = action.enabled
+            Object.assign(player, action.player)
             return Object.assign({}, state, {players: newPlayers})
         case actionTypes.DEL_PLAYER:
             var players = state.players.filter(function (itm) {
-                return action.ip != itm.ip;
+                return action.player.ip != itm.ip;
             });
             return Object.assign({}, state, {players: players})
         case actionTypes.SET_USER:

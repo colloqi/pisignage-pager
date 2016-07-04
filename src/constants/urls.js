@@ -1,14 +1,31 @@
-let base = 'https://efle3r.colloqi.com'
+let base = ''
 
 export default {
-    base: base,
-    category: base+'/api/categories',
-    users: base+'/api/users',
-    stats: base+'/api/Stats',
-    messages: base+'/api/messages',
-    groups: base+'/api/groups',
-    containers: base+'/api/containers',
-    login: base+'/api/users/login?include=user&rememberMe=true',
-    logout: base+'/api/users/logout',
-    resetPassword: base+'/api/users/reset'
+    files:           base + 'api/files/' ,
+    filespostupload: base + 'api/postupload',
+    labels:          base + 'api/labels/' ,
+    notices:         base + 'api/notices/',
+    calendars:       base + 'api/calendars/',
+    playlists:       base + 'api/playlists/',
+    play:            base + 'api/play/playlists/',
+    fileplay:        base + 'api/play/files/',
+    getStatus:       base + 'api/status/',
+    getStats:        base + 'api/getstats/',
+    getActivityReports: base + 'api/getactivityreports/',
+    getStatsDetails: base + 'api/getstatsdetails/',
+    getConnectStats: base + 'api/getconnectstats/',
+    settings:        base + 'api/settings/',
+    piswupdate:      base + 'api/piswupdate/',
+
+    players:         base + 'api/players/',
+    groups:          base + 'api/groups/',
+    pishell:         base + 'api/pishell/',
+    swupdate:        base + 'api/swupdate/',
+
+    usernames:       base + 'api/usernames/',
+    collaborators:   base + 'api/collaborators/',
+    downloadauth:    base + 'api/downloadauth',
+
+    users:           base + 'api/users'
+
 }

@@ -18,7 +18,7 @@ export const SHOW_TOKEN = 'SHOW_TOKEN';
 
 export const ADD_PLAYER = 'ADD_PLAYER';
 export const DEL_PLAYER = 'DEL_PLAYER';
-export const ENABLE_PLAYER = 'ENABLE_PLAYER';
+export const UPDATE_PLAYER = 'UPDATE_PLAYER';
 
 export const SET_USER = 'SET_USER';
 
