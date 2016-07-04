@@ -42,20 +42,6 @@ export function delCounter(counter) {
     }
 }
 
-export function addToken(token) {
-    return {
-        type: actionTypes.ADD_TOKEN,
-        token
-    }
-}
-
-export function delToken(token) {
-    return {
-        type: actionTypes.DEL_TOKEN,
-        token
-    }
-}
-
 export function setUser(user,password) {
     var token = 'Basic '+btoa(user+':'+password);
     return {

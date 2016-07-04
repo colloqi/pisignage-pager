@@ -43,10 +43,22 @@ export default function reducer(state = initState, action) {
             });
             return Object.assign({}, state, {tokens: tokens})
         case actionTypes.ADD_PLAYER:
-            return Object.assign({}, state, {players: state.players.concat(action.player)})
+            let newPlayer = {
+                ip:action.ip,
+                enabled: true,
+                name: ""
+            }
+            return Object.assign({}, state, {players: state.players.concat(newPlayer)})
+        case actionTypes.ENABLE_PLAYER:
+            var newPlayers = state.players.slice()
+            var player = newPlayers.find(function(player) {
+                return player.ip === action.ip;
+            })
+            player.enabled = action.enabled
+            return Object.assign({}, state, {players: newPlayers})
         case actionTypes.DEL_PLAYER:
             var players = state.players.filter(function (itm) {
-                return action.player != itm;
+                return action.ip != itm.ip;
             });
             return Object.assign({}, state, {players: players})
         case actionTypes.SET_USER:

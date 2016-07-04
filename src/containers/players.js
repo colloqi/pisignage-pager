@@ -14,16 +14,16 @@ import Dialog from 'material-ui/Dialog';
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {addPlayer, delPlayer} from "../actions/player"
+import {addPlayer, delPlayer, enablePlayer} from "../actions/player"
 
 let PlayerList = React.createClass({
     render: function () {
         let players = []
         for (let entry of this.props.players) {
             players.push(
-                <ListItem key={entry} primaryText={entry}
-                          leftIcon={<DeleteIcon onTouchTap={this.props.cb.bind(null,entry)} />}
-                          rightToggle={<Toggle />}
+                <ListItem key={entry.ip} primaryText={entry.ip}
+                          leftIcon={<DeleteIcon onTouchTap={this.props.deleteCb.bind(null,entry)} />}
+                          rightToggle={<Toggle  toggled={entry.enabled} onToggle={this.props.enableCb.bind(null,entry)}/>}
                 />
             )
         }
@@ -38,7 +38,8 @@ let PlayerList = React.createClass({
 
 PlayerList.propTypes = {
     players: PropTypes.array.isRequired,
-    cb: PropTypes.func.isRequired
+    deleteCb: PropTypes.func.isRequired,
+    enableCb: PropTypes.func.isRequired
 };
 
 
@@ -62,7 +63,11 @@ let Players = React.createClass({
         this.setState({playerText: ""});
     },
     delPlayer: function (player, e) {
-        this.props.dispatch(delPlayer(player))
+        this.props.dispatch(delPlayer(player.ip))
+    },
+    enablePlayer: function (player, e) {
+        player.enabled = !player.enabled
+        this.props.dispatch(enablePlayer(player.ip, player.enabled))
     },
     scanNetwork: function() {
         this.props.dispatch(scanNetwork(this.state.startip, this.state.endip))
@@ -102,7 +107,7 @@ let Players = React.createClass({
                             <RefreshIcon />
                         </IconButton>
                     </ListItem>
-                    <PlayerList players={this.props.players} cb={this.delPlayer}/>
+                    <PlayerList players={this.props.players} enableCb={this.enablePlayer} deleteCb={this.delPlayer}/>
                 </List>
                 <Dialog
                     title="Select Address Range"
