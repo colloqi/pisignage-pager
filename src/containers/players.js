@@ -20,11 +20,18 @@ let PlayerList = React.createClass({
     render: function () {
         let players = []
         for (let entry of this.props.players) {
+            let props = {
+                key: entry.ip,
+                primaryText: <h3>{entry.ip}</h3>,
+                leftIcon: <DeleteIcon onTouchTap={this.props.deleteCb.bind(null,entry)} />,
+                rightToggle:<Toggle  toggled={entry.enabled} onToggle={this.props.enableCb.bind(null,entry)}/>
+            }
+            if (entry.active) {
+                props.secondaryText = <h4>{entry.name}</h4>
+                props.style = {"backgroundColor": "lightGreen"}
+            }
             players.push(
-                <ListItem key={entry.ip} primaryText={entry.ip}
-                          leftIcon={<DeleteIcon onTouchTap={this.props.deleteCb.bind(null,entry)} />}
-                          rightToggle={<Toggle  toggled={entry.enabled} onToggle={this.props.enableCb.bind(null,entry)}/>}
-                />
+                <ListItem {...props} />
             )
         }
 
@@ -45,6 +52,9 @@ PlayerList.propTypes = {
 
 let Players = React.createClass({
     getInitialState: function () {
+        for (let entry of this.props.players) {
+            this.props.dispatch(checkPlayer(entry.ip))    
+        }
         return ({
             playerText: "",
             modalOpen: false,

@@ -26,13 +26,19 @@ export function updatePlayer(player) {
 
 export function checkPlayer(ip) {
     return (dispatch,getState) => {
-        let player = {
-            ip:ip,
-            enabled: true,
-            name: "",
-            active: false
+        const players = getState().token.players;
+        let player = players.find(function(player) {
+            return player.ip === ip;
+        })
+        if (!player) {      //Add the player
+            player = {
+                ip: ip,
+                enabled: true,
+                name: "",
+                active: false
+            }
+            dispatch(addPlayer(player))
         }
-        dispatch(addPlayer(player))
         const token = getState().token.settings.credentials.token
         return fetch('http://'+ip+':8000/'+urls.settings, {
             method: 'GET',
