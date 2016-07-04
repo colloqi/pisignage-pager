@@ -19,6 +19,7 @@ import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser,
 let VolumeLevel = React.createClass({
 
     handleChange(event, value) {
+        event.stopPropagation();
         this.props.cb(value);
     },
 
@@ -73,6 +74,7 @@ let TokenSettings = React.createClass({
         return ({
             modalOpen: false,
             snackbarOpen: false,
+            snackbarText: "",
             counterText: "",
             volume: this.props.sound.volume,
             user: this.props.credentials.user,
@@ -159,7 +161,7 @@ let TokenSettings = React.createClass({
                             style={{width: "70%"}} type="text"
                             hintText="Add counters"
                             value={this.state.counterText}
-                            onChange={(e) => {this.setState({counterText: e.target.value})}}
+                            onChange={(e) => {e.stopPropagation();this.setState({counterText: e.target.value})}}
                         />
                         <FlatButton primary={true}
                                     disabled={!this.state.counterText}
@@ -180,7 +182,7 @@ let TokenSettings = React.createClass({
                             hintText=""
                             floatingLabelText="User Name"
                             value={this.state.user}
-                            onChange={(e) => {this.setState({user: e.target.value})}}
+                            onChange={(e) => {e.stopPropagation();this.setState({user: e.target.value})}}
                         />
                     </ListItem>
                     <ListItem>
@@ -191,7 +193,7 @@ let TokenSettings = React.createClass({
                             hintText=""
                             floatingLabelText="Password"
                             value={this.state.password}
-                            onChange={(e) => {this.setState({password: e.target.value})}}
+                            onChange={(e) => {e.stopPropagation();this.setState({password: e.target.value})}}
                         />
                         <FlatButton primary={true}
                                     disabled={!this.state.user || !this.state.password}
@@ -221,7 +223,7 @@ let TokenSettings = React.createClass({
                         hintText=""
                         floatingLabelText="From"
                         value= {this.state.from}
-                        onChange={(e) => {this.setState({from: e.target.value})}}
+                        onChange={(e) => {e.stopPropagation();this.setState({from: e.target.value})}}
                     /><br/>
                     <TextField
                         type="number"
@@ -229,7 +231,7 @@ let TokenSettings = React.createClass({
                         hintText=""
                         floatingLabelText="Till"
                         value= {this.state.till}
-                        onChange={(e) => {this.setState({till: e.target.value})}}
+                        onChange={(e) => {e.stopPropagation();this.setState({till: e.target.value})}}
                     />
                 </Dialog>
                 <Snackbar

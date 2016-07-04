@@ -38,10 +38,13 @@ let Layout = React.createClass({
     getInitialState: function () {
         return {value: "tokens"};
     },
-    handleChange: function(value) {
-        this.setState({
-            value: value
-        });
+    handleChange: function (value) {
+        if (typeof value == "string")
+            this.setState({
+                value: value
+            });
+        else
+            console.log("value is not of string type")
     },
     render: function () {
         const showFloatingButton = (this.state.value == "tokens")
@@ -54,7 +57,7 @@ let Layout = React.createClass({
                     <Tab icon={<SettingsIcon />} label="Settings" value={"settings"}>
                         <TokenSettings/>
                     </Tab>
-                    <Tab icon={<TvIcon />} label="Displays" value={"players"} >
+                    <Tab icon={<TvIcon />} label="Displays" value={"players"}>
                         <Players/>
                     </Tab>
                 </Tabs>
@@ -64,12 +67,12 @@ let Layout = React.createClass({
 })
 
 Layout.childContextTypes = {
-    muiTheme: React.PropTypes.object.isRequired,
+    muiTheme: React.PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
     return {
-        error: state.message,
+        error: state.message
     };
 }
 

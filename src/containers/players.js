@@ -95,7 +95,7 @@ let Players = React.createClass({
                             style={{width: "60%"}} type="text"
                             hintText="Add a player IP"
                             value={this.state.playerText}
-                            onChange={(e) => {this.setState({playerText: e.target.value})}}
+                            onChange={(e) => {e.stopPropagation();this.setState({playerText: e.target.value})}}
                         />
                         <FlatButton primary={true}
                                     disabled={!this.state.playerText}
@@ -122,7 +122,7 @@ let Players = React.createClass({
                         hintText="192.168.1.1"
                         value={this.state.startip}
                         floatingLabelText="Start Address"
-                        onChange={(e) => {this.setState({startip: e.target.value})}}
+                        onChange={(e) => {e.stopPropagation();this.setState({startip: e.target.value})}}
                     />
                     <TextField
                         type="text"
@@ -130,7 +130,7 @@ let Players = React.createClass({
                         hintText="254"
                         value={this.state.endip}
                         floatingLabelText="Till"
-                        onChange={(e) => {this.setState({endip: e.target.value})}}
+                        onChange={(e) => {e.stopPropagation();this.setState({endip: e.target.value})}}
                     />
                 </Dialog>
             </div>

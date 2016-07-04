@@ -153,7 +153,7 @@ let Tokens = React.createClass({
                         style={{width: "70%"}} type="number"
                         hintText="Add a token"
                         value={this.state.tokenText}
-                        onChange={(e) => {this.setState({tokenText: e.target.value})}}
+                        onChange={(e) => {e.stopPropagation();this.setState({tokenText: e.target.value})}}
                     />
                     <FlatButton primary={true}
                                 disabled={!this.state.tokenText}
@@ -198,12 +198,14 @@ Tokens.propTypes = {
     tokens: PropTypes.array.isRequired
 };
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
+    //console.log(ownProps)
     return {
         counters: state.token.counters,
         tokens: state.token.tokens,
         selectedToken: state.token.selectedToken,
-        selectedCounter: state.token.selectedCounter
+        selectedCounter: state.token.selectedCounter,
+        showFloatingButton: ownProps.showFloatingButton
     };
 }
 
