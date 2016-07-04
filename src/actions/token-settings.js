@@ -2,6 +2,12 @@ import fetch from 'isomorphic-fetch';
 import * as actionTypes from '../constants/ActionTypes';
 import urls from '../constants/urls';
 
+export function clearAllSettings() {
+    return {
+        type: actionTypes.CLEAR_ALL_SETTINGS
+    }
+}
+
 export function clearTokens() {
     return {
         type: actionTypes.CLEAR_TOKENS

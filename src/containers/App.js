@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {Route, IndexRoute, Router} from 'react-router';
 
 import Layout from './Layout';
-import PlayerSettings from '../components/player-settings';
 
 /**
  * It is common practice to have a 'Root' container/component require our main App (this one).
@@ -17,7 +16,6 @@ class App extends Component {
         return (
             <Router histoy={history}>
                 <Route path='/' component={Layout} />
-                <Route path='players/:playerId' component={PlayerSettings} />
             </Router>
         );
     }

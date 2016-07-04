@@ -14,7 +14,7 @@ import Slider from 'material-ui/Slider';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser} from "../actions/token-settings"
+import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser, clearAllSettings} from "../actions/token-settings"
 
 let VolumeLevel = React.createClass({
 
@@ -87,8 +87,8 @@ let TokenSettings = React.createClass({
     displayModalClose: function () {
         this.setState({modalOpen: false});
     },
-    snackbarModalOpen: function () {
-        this.setState({snackbarOpen: true});
+    snackbarModalOpen: function (text) {
+        this.setState({snackbarOpen: true, snackbarText: text});
     },
     snackbarModalClose: function () {
         this.setState({snackbarOpen: false});
@@ -103,7 +103,7 @@ let TokenSettings = React.createClass({
     },
     clearTokens: function () {
         this.props.dispatch(clearTokens())
-        this.snackbarModalOpen();
+        this.snackbarModalOpen("Cleared all the Tokens");
     },
     addCounter: function () {
         this.props.dispatch(addCounter(this.state.counterText))
@@ -118,6 +118,10 @@ let TokenSettings = React.createClass({
     },
     saveUser: function () {
         this.props.dispatch(setUser(this.state.user,this.state.password))
+    },
+    clearAllSettings: function () {
+        this.props.dispatch(clearAllSettings())
+        this.snackbarModalOpen("Cleared all the Settings");
     },
     render: function () {
         const modelActions = [
@@ -143,8 +147,8 @@ let TokenSettings = React.createClass({
                         onTouchTap={this.displayModalOpen}
                     />
                     <ListItem
-                        primaryText="Clear All"
-                        secondaryText="Clear All tokens"
+                        primaryText="Clear All Tokens"
+                        secondaryText="Clears existing Tokens"
                         onTouchTap={this.clearTokens}
                     />
                     <Divider />
@@ -195,6 +199,13 @@ let TokenSettings = React.createClass({
                                     label="Save"
                         />
                     </ListItem>
+                    <Divider />
+                    <ListItem
+                        primaryText="Clear All Settings"
+                        secondaryText="Delete all settings and goes to default"
+                        onTouchTap={this.clearAllSettings}
+                    />
+
 
                 </List>
                 <Dialog
@@ -223,7 +234,7 @@ let TokenSettings = React.createClass({
                 </Dialog>
                 <Snackbar
                     open={this.state.snackbarOpen}
-                    message="Cleared all the Tokens"
+                    message={this.state.snackbarText}
                     autoHideDuration={2000}
                     onRequestClose={this.snackbarModalClose}
                 />

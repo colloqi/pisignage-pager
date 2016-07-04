@@ -20,6 +20,8 @@ export default function reducer(state = initState, action) {
             var newstate = Object.assign({}, state)
             newstate.settings.sound.volume = action.volume
             return newstate
+        case actionTypes.CLEAR_ALL_SETTINGS:
+            return Object.assign({}, state, initState)
         case actionTypes.CLEAR_TOKENS:
             return Object.assign({}, state, {tokens: []})
         case actionTypes.GENERATE_TOKENS:
