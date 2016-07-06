@@ -51,9 +51,17 @@ PlayerList.propTypes = {
 
 
 let Players = React.createClass({
+    componentDidMount: function() {
+        const {players,dispatch} = this.props
+        setInterval(function(){
+            for (let entry of players) {
+                dispatch(checkPlayer(entry.ip))
+            }
+        },30000)
+    },
     getInitialState: function () {
         for (let entry of this.props.players) {
-            this.props.dispatch(checkPlayer(entry.ip))    
+            this.props.dispatch(checkPlayer(entry.ip))
         }
         return ({
             playerText: "",
