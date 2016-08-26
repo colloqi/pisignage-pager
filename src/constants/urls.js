@@ -26,6 +26,9 @@ export default {
     collaborators:   base + 'api/collaborators/',
     downloadauth:    base + 'api/downloadauth',
 
-    users:           base + 'api/users'
+    users:           base + 'api/users',
+    
+    token:           base + 'api/tokens',
+    currentToken:    base + 'api/current-token'
 
 }

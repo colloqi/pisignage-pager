@@ -10,25 +10,43 @@ import IconButton from 'material-ui/IconButton';
 import {List, ListItem} from 'material-ui/List'
 
 import Dialog from 'material-ui/Dialog';
+import MenuItem from 'material-ui/MenuItem';
+import SelectField from 'material-ui/SelectField';
 
 import RefreshIcon from 'material-ui/svg-icons/navigation/refresh';
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {checkPlayer, delPlayer, updatePlayer} from "../actions/player"
+import {checkPlayer, delPlayer, updatePlayer, scanNetwork, assignCounter} from "../actions/player";
 
 let PlayerList = React.createClass({
+    getInitialState: function() {
+        return {open: false, player:{}, players: this.props.players};
+    },
     render: function () {
-        let players = []
+        let players = [], countersList = [];
+        for(var counter of this.props.counters) {
+            countersList.push(<MenuItem value={counter} primaryText={counter.name} key={counter.name} />);
+        }
         for (let entry of this.props.players) {
             let props = {
                 key: entry.ip,
                 primaryText: <h3>{entry.ip}</h3>,
                 leftIcon: <DeleteIcon onTouchTap={this.props.deleteCb.bind(null,entry)} />,
-                rightToggle:<Toggle  toggled={entry.enabled} onToggle={this.props.enableCb.bind(null,entry)}/>
+                rightToggle:<Toggle toggled={entry.enabled} onToggle={this.props.enableCb.bind(null,entry)}/>
             }
             if (entry.active) {
                 props.secondaryText = <h4>{entry.name}</h4>
                 props.style = {"backgroundColor": "lightGreen"}
+            }
+            if (entry.enabled) {
+                props.children = <ListItem>
+                                    <SelectField floatingLabelText='Select counter for the player' value={entry.counter}
+                                                onChange={this.props.counterCb.bind(null, entry)} fullWidth={true}>
+                                        {countersList}
+                                    </SelectField>
+                                    <FlatButton />
+                                </ListItem>;
+                props.insetChildren = true;
             }
             players.push(
                 <ListItem {...props} />
@@ -46,7 +64,8 @@ let PlayerList = React.createClass({
 PlayerList.propTypes = {
     players: PropTypes.array.isRequired,
     deleteCb: PropTypes.func.isRequired,
-    enableCb: PropTypes.func.isRequired
+    enableCb: PropTypes.func.isRequired,
+    counterCb: PropTypes.func.isRequired
 };
 
 
@@ -67,7 +86,8 @@ let Players = React.createClass({
             playerText: "",
             modalOpen: false,
             startip: this.props.lan.startip,
-            endip: this.props.lan.endip
+            endip: this.props.lan.endip,
+            players: this.props.players
         })
     },
     displayModalOpen: function () {
@@ -79,6 +99,9 @@ let Players = React.createClass({
     addPlayer: function () {
         this.props.dispatch(checkPlayer(this.state.playerText))
         this.setState({playerText: ""});
+    },
+    setCounter: function(player, evt, index, item) {
+        this.props.dispatch(assignCounter(player,item));
     },
     delPlayer: function (player, e) {
         this.props.dispatch(delPlayer(player))
@@ -126,7 +149,7 @@ let Players = React.createClass({
                             <RefreshIcon />
                         </IconButton>
                     </ListItem>
-                    <PlayerList players={this.props.players} enableCb={this.enablePlayer} deleteCb={this.delPlayer}/>
+                    <PlayerList players={this.props.players} counterCb={this.setCounter} counters={this.props.counters} enableCb={this.enablePlayer} deleteCb={this.delPlayer}/>
                 </List>
                 <Dialog
                     title="Select Address Range"
@@ -164,8 +187,9 @@ Players.propTypes = {
 function mapStateToProps(state) {
     return {
         players: state.token.players,
-        lan: state.token.settings.lan
+        lan: state.token.settings.lan,
+        counters: state.token.counters
     };
 }
 
-export default connect(mapStateToProps)(Players);
+export default connect(mapStateToProps, null, null, {pure: false})(Players);

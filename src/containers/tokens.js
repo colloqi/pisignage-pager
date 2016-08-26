@@ -16,7 +16,7 @@ import SkipNext from 'material-ui/svg-icons/av/skip-next';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {addToken, showToken, delToken} from "../actions/token"
+import {newToken, displayToken, removeToken} from "../actions/token"
 
 const style = {
     bottom: 20,
@@ -26,6 +26,9 @@ const style = {
 
 
 let TokenList = React.createClass({
+    shouldComponentUpdate(newState) {
+        return true;
+    },
     componentDidUpdate(prevProps) {
         if (this.props.selectedToken !== prevProps.selectedToken) {
             this.scrollToTop();
@@ -47,8 +50,12 @@ let TokenList = React.createClass({
                 onTouchTap: this.props.cbShow.bind(null, entry),
                 rightIcon: <DeleteIcon onTouchTap={this.props.cbDelete.bind(null,entry)}/>
             }
-            if (this.props.selectedToken == entry) {
-                props.secondaryText = <h3>Now Showing for Counter {this.props.selectedCounter}</h3>
+            if (this.props.selectedToken == entry || (this.props.showingTokens && Object.values(this.props.showingTokens).indexOf(entry) >= 0)) {
+                var counters = [];
+                for(var key in this.props.showingTokens) {
+                    this.props.showingTokens[key] == entry ? counters.push(key) : '';
+                }
+                props.secondaryText = <h3>Now Showing for Counters: {counters.toString()}</h3>
                 props.ref = "active"
                 props.style = {"backgroundColor": "lightBlue"}
             }
@@ -99,19 +106,19 @@ let Tokens = React.createClass({
     },
 
     addToken: function () {
-        this.props.dispatch(addToken(this.state.tokenText))
+        this.props.dispatch(newToken(this.state.tokenText))
         this.setState({tokenText: ""});
     },
     selectCounter: function(token,e) {
         if (this.props.counters.length) {
             this.showPopover(e)
         } else {
-            this.props.dispatch(showToken(token))
+            this.props.dispatch(displayToken(token))
         }
     },
     dispatchToken: function(counter,e) {
         this.setState({selectedCounter: counter})
-        this.props.dispatch(showToken(this.state.selectedToken,counter))
+        this.props.dispatch(displayToken(this.state.selectedToken,counter))
         this.handleMenuClose()
     },
     showToken: function (token, e) {
@@ -132,15 +139,15 @@ let Tokens = React.createClass({
         this.selectCounter(nextToken,e)
     },
     delToken: function (token, e) {
-        this.props.dispatch(delToken(token))
+        this.props.dispatch(removeToken(token))
     },
     render: function () {
         let counters = [];
         for (let entry of this.props.counters) {
             counters.push(
                 <MenuItem
-                    key = {entry}
-                    primaryText= {<h1>{entry}</h1>}
+                    key = {entry.name}
+                    primaryText= {<h1>{entry.name}</h1>}
                     onTouchTap= {this.dispatchToken.bind(null,entry)}
                 />
             )
@@ -164,6 +171,7 @@ let Tokens = React.createClass({
                 <TokenList tokens={this.props.tokens}
                            selectedToken={this.props.selectedToken}
                            selectedCounter={this.props.selectedCounter}
+                           showingTokens={this.props.showingTokens}
                            cbShow={this.showToken}
                            cbDelete={this.delToken}
                 />
@@ -205,6 +213,7 @@ function mapStateToProps(state, ownProps) {
         tokens: state.token.tokens,
         selectedToken: state.token.selectedToken,
         selectedCounter: state.token.selectedCounter,
+        showingTokens: state.token.showingTokens,
         showFloatingButton: ownProps.showFloatingButton
     };
 }

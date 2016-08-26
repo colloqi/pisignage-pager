@@ -23,6 +23,7 @@ import baseTheme from 'material-ui/styles/baseThemes/lightBaseTheme';
 import getMuiTheme from 'material-ui/styles/getMuiTheme';
 
 import urls from '../constants/urls';
+import {displayToken} from '../actions/token';
 
 import Players from  './players';
 import TokenSettings from './token-settings';
@@ -33,7 +34,11 @@ let Layout = React.createClass({
         return {muiTheme: getMuiTheme(baseTheme)};
     },
     componentDidMount: function () {
-        const {dispatch} = this.props;
+        const {dispatch, counters} = this.props;
+        
+        for(var counter of this.props.counters) {
+            counter.rollOverTime ? dispatch(displayToken(null,counter)) : '';
+        }
     },
     getInitialState: function () {
         return {value: "tokens"};
@@ -72,7 +77,8 @@ Layout.childContextTypes = {
 
 function mapStateToProps(state) {
     return {
-        error: state.message
+        error: state.message,
+        counters: state.token.counters
     };
 }
 

@@ -6,7 +6,8 @@ import {List, ListItem} from 'material-ui/List';
 import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
 import Snackbar from 'material-ui/Snackbar';
-import RaisedButton from 'material-ui/RaisedButton'
+import RaisedButton from 'material-ui/RaisedButton';
+import Checkbox from 'material-ui/Checkbox';
 
 import FlatButton from 'material-ui/FlatButton';
 import Divider from 'material-ui/Divider';
@@ -14,7 +15,7 @@ import Slider from 'material-ui/Slider';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser, clearAllSettings} from "../actions/token-settings"
+import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser, clearAllSettings, editCounter, deleteOnShow} from "../actions/token-settings"
 
 let VolumeLevel = React.createClass({
 
@@ -45,14 +46,76 @@ VolumeLevel.propTypes = {
     cb: PropTypes.func.isRequired,
 };
 
+let RolloverTimer = React.createClass({
+    getInitialState: function() {
+        return {setTimer: this.props.counter.rollOverTime ? true : false, rollOverTime:this.props.counter.rollOverTime}
+    },
+    editTimer: function() {
+        let counter = this.props.counter;
+        counter.rollOverTime = this.state.rollOverTime;
+        this.props.editCounter(counter);
+    },
+    unsetTimer: function(evt, isChecked) {
+        var counter = this.props.counter;
+        counter.rollOverTime = null;
+        this.props.editCounter(counter);
+        this.setState({setTimer: isChecked, rollOverTime:null});
+    },
+    render: function() {
+        var timer = <div></div>;
+        if (this.state.setTimer) {
+            timer = <ListItem><TextField onChange={(evt) => {this.setState({rollOverTime: evt.target.value})}}
+                            value={this.state.rollOverTime} floatingLabelText='Display next token after (seconds)' />
+                            <FlatButton label='Set timer' onTouchTap={this.editTimer} /></ListItem>;
+        }
+        return <div>
+            <Checkbox onCheck={this.unsetTimer}
+                defaultChecked={this.state.setTimer} label='Auto-display tokens one after another' />
+            {timer}
+        </div>
+    }
+})
+
+let LifeTimer = React.createClass({
+    getInitialState: function() {
+        return {setTimer: this.props.counter.lifeTime ? true : false, lifeTime:this.props.counter.lifeTime}
+    },
+    editTimer: function() {
+        let counter = this.props.counter;
+        counter.lifeTime = this.state.setTimer ? this.state.lifeTime : null;
+        this.props.editCounter(counter);
+    },
+    render: function() {
+        var timer = <div></div>;
+        if (this.state.setTimer) {
+            timer = <ListItem>
+                        <TextField onChange={(evt) => {this.setState({lifeTime: evt.target.value})}}
+                            value={this.state.lifeTime} floatingLabelText='Delete all tokens after (seconds)' />
+                        <FlatButton label='Set timer' onTouchTap={this.editTimer} />
+                    </ListItem>;
+        }
+        return <div>
+            <Checkbox onCheck={(evt, isChecked) => {this.setState({setTimer: isChecked});this.editTimer()}}
+                defaultChecked={this.state.setTimer} label='Delete tokens after a pre-set time' />
+            {timer}
+        </div>
+    }
+})
+
 let CounterList = React.createClass({
     render: function () {
         let counters = [];
         for (let entry of this.props.counters) {
+            let timers = [
+                    <Checkbox onCheck={(evt, isChecked) => {entry.deleteOnShow=isChecked; this.props.editCounter(entry)}} defaultChecked={entry.deleteOnShow} label='Delete token after display' />,
+                    <RolloverTimer counter={entry} editCounter={this.props.editCounter}/>,
+                    <LifeTimer counter={entry} editCounter={this.props.editCounter}/>
+                ];
             counters.push(
-                <ListItem key={entry} primaryText={entry}
-                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(null,entry)} />
-                }/>
+                <ListItem key={entry.name} primaryText={entry.name} primaryTogglesNestedList={true} 
+                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(null,entry)}/>}
+                          nestedItems={timers}
+                />
             )
         }
         return (
@@ -68,7 +131,6 @@ CounterList.propTypes = {
     cb: PropTypes.func.isRequired
 };
 
-
 let TokenSettings = React.createClass({
     getInitialState: function () {
         return ({
@@ -80,7 +142,7 @@ let TokenSettings = React.createClass({
             user: this.props.credentials.user,
             password: this.props.credentials.password,
             from: this.props.counter.from,
-            till: this.props.counter.till
+            till: this.props.counter.till,
         })
     },
     displayModalOpen: function () {
@@ -125,6 +187,12 @@ let TokenSettings = React.createClass({
         this.props.dispatch(clearAllSettings())
         this.snackbarModalOpen("Cleared all the Settings");
     },
+    editCounter: function (counter) {
+        this.props.dispatch(editCounter(counter));
+    },
+    deleteOnShow: function (evt, isChecked) {
+        this.props.dispatch(deleteOnShow(isChecked));
+    },
     render: function () {
         const modelActions = [
             <FlatButton
@@ -139,6 +207,16 @@ let TokenSettings = React.createClass({
             />
         ];
 
+        let timer;
+        if (this.state.setTimer) {
+            timer = <ListItem><TextField onChange={(evt) => {this.setState({rollOverTime: evt.target.value})}}
+                            value={this.state.rollOverTime}
+                            floatingLabelText='Display next token after (seconds)' />
+                            <FlatButton label='Set timer' onTouchTap={this.setRollOverTime} /></ListItem>;
+        } else {
+            timer = <div></div>;
+        }
+        
         return (
             <div>
                 <List>
@@ -153,9 +231,10 @@ let TokenSettings = React.createClass({
                         secondaryText="Clears existing Tokens"
                         onTouchTap={this.clearTokens}
                     />
+                    
                     <Divider />
                     <Subheader>Counters</Subheader>
-                    <CounterList counters={this.props.counters} cb={this.delCounter}/>
+                    <CounterList counters={this.props.counters} cb={this.delCounter} editCounter={this.editCounter}/>
                     <ListItem>
                         <TextField
                             style={{width: "70%"}} type="text"
@@ -257,7 +336,9 @@ function mapStateToProps(state) {
         sound: state.token.settings.sound,
         credentials: state.token.settings.credentials,
         counter: state.token.settings.counter,
-        counters: state.token.counters
+        counters: state.token.counters,
+        rollOverTime: state.token.settings.rollOverTime,
+        deleteOnShow: state.token.settings.deleteOnShow
     };
 }
 

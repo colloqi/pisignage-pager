@@ -1,6 +1,7 @@
 import fetch from 'isomorphic-fetch';
 import * as actionTypes from '../constants/ActionTypes';
 import urls from '../constants/urls';
+import async from 'async';
 
 export function addPlayer(player) {
     return {
@@ -23,6 +24,71 @@ export function updatePlayer(player) {
     }
 }
 
+export function scanPlayers(players) {
+    return {
+        type: actionTypes.SCAN_PLAYERS,
+        players
+    }
+}
+
+export function message(title, content) {
+    return {
+        type: actionTypes.MESSAGE,
+        title,
+        content
+    }
+}
+
+export function assignCounter(player, counter) {
+    return (dispatch, getState) => {
+        var object = {rollOverTime: counter.rollOverTime, lifeTimer: counter.lifeTime, deleteOnShow: counter.deleteOnShow,
+                        counterName: counter.name, currentToken: getState().token.showingTokens[counter.name]};
+        player.counter = counter;
+        fetch('http://'+player.ip+':8000/'+urls.token, {
+            method: 'POST',
+            headers: {
+                'authorization': getState().token.settings.credentials.token,
+                'Content-Type': 'application/json;charset=UTF-8'
+            },
+            body: JSON.stringify(object)
+        }).then(
+            response => dispatch(updatePlayer(player)),
+            error => dispatch(updatePlayer(player))
+        )
+    }
+}
+
+export function scanNetwork(startip, totalips) {
+    let players = {};
+    return (dispatch,getState) => {
+        let addressPrefix = startip.slice(0,startip.lastIndexOf('.')+1),
+            address = parseInt(startip.slice(startip.lastIndexOf('.')+1)),
+            end = parseInt(startip.slice(startip.lastIndexOf('.')+1)) + (parseInt(totalips) - 1), ips = [];
+        const token = getState().token.settings.credentials.token
+        function pingPlayers(ip,cb) {
+            fetch('http://'+ip+':8001/', {
+                method: 'GET',
+                headers: {
+                    'authorization': token
+                }
+            }).then(
+                response => {
+                    players[ip] = {ip:ip,version:'NA',active:true};
+                    checkPlayer(ip);
+                    cb();
+                },
+                error => cb()
+            )
+        }
+        for(var i=address; i<= end; i++) {
+            ips.push(addressPrefix+i);
+        }
+
+        async.eachLimit(ips,ips.length,pingPlayers,function(err) {
+            dispatch(scanPlayers(players));
+        })
+    }
+}
 
 export function checkPlayer(ip) {
     return (dispatch,getState) => {
