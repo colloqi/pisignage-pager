@@ -73,9 +73,12 @@ export function scanNetwork(startip, totalips) {
                 }
             }).then(
                 response => {
-                    players[ip] = {ip:ip,version:'NA',active:true};
-                    checkPlayer(ip);
-                    cb();
+                    response.json().then(parsedResponse => {
+                        if (parsedResponse.data.indexOf("PiSignage Player") >= 0) {
+                            checkPlayer(ip);
+                            cb();
+                        }
+                    });
                 },
                 error => cb()
             )
