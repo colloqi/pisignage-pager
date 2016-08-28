@@ -29,6 +29,7 @@ export default function reducer(state = initState, action) {
             return Object.assign({}, state, {tokens: action.tokens})
         case actionTypes.ADD_COUNTER:
             var counter = {name:action.counter, rollOverTime:null, lifeTime: null, deleteOnShow: false};
+            state.counters.length == 0 ? delete state.showingTokens['counter'] : '';
             return Object.assign({}, state, {counters: state.counters.concat(counter)})
         case actionTypes.DEL_COUNTER:
             var counters = state.counters.filter(function (itm) {
@@ -46,11 +47,12 @@ export default function reducer(state = initState, action) {
         case actionTypes.ADD_TOKEN:
             return Object.assign({}, state, {tokens: state.tokens.concat(action.token)})
         case actionTypes.SHOW_TOKEN:
-            var showingTokens = state.showingTokens || {};
-            var prevToken = showingTokens[action.counter ? action.counter.name : 'counter'];
-            showingTokens[action.counter ? action.counter.name : 'counter'] = action.token;
+            var showingTokens = state.showingTokens || {},
+                counter = action.counter || {name: 'counter', deleteOnShow: false};
+            var prevToken = showingTokens[counter.name];
+            showingTokens[counter.name] = action.token;
             var tokens = state.tokens;
-            action.counter && action.counter.deleteOnShow ? tokens.splice(tokens.indexOf(prevToken),1) : '';
+            counter.deleteOnShow ? tokens.splice(tokens.indexOf(prevToken),1) : '';
             return Object.assign({}, state, {selectedToken: action.token, selectedCounter: action.counter, showingTokens: showingTokens, tokens: tokens})
         case actionTypes.DEL_TOKEN:
             var tokens = state.tokens.filter(function (itm) {

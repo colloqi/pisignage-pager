@@ -19,9 +19,6 @@ import DeleteIcon from 'material-ui/svg-icons/action/delete';
 import {checkPlayer, delPlayer, updatePlayer, scanNetwork, assignCounter} from "../actions/player";
 
 let PlayerList = React.createClass({
-    getInitialState: function() {
-        return {open: false, player:{}, players: this.props.players};
-    },
     render: function () {
         let players = [], countersList = [];
         for(var counter of this.props.counters) {
@@ -41,12 +38,11 @@ let PlayerList = React.createClass({
             if (entry.enabled) {
                 props.children = <ListItem>
                                     <SelectField floatingLabelText='Select counter for the player' value={entry.counter}
-                                                onChange={this.props.counterCb.bind(null, entry)} fullWidth={true}>
+                                                onChange={this.props.counterCb.bind(null, entry)} >
                                         {countersList}
                                     </SelectField>
                                     <FlatButton />
                                 </ListItem>;
-                props.insetChildren = true;
             }
             players.push(
                 <ListItem {...props} />
