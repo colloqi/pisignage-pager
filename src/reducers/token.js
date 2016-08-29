@@ -73,8 +73,6 @@ export default function reducer(state = initState, action) {
                 return action.player.ip != itm.ip;
             });
             return Object.assign({}, state, {players: players})
-        case actionTypes.SCAN_PLAYERS:
-            return Object.assign({}, state, {players: Object.values(action.players)})
         case actionTypes.ASSIGN_COUNTER:
             let players = state.players;
             players[players.indexOf(action.player)].counter = action.counter;

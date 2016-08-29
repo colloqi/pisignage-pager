@@ -24,13 +24,6 @@ export function updatePlayer(player) {
     }
 }
 
-export function scanPlayers(players) {
-    return {
-        type: actionTypes.SCAN_PLAYERS,
-        players
-    }
-}
-
 export function message(title, content) {
     return {
         type: actionTypes.MESSAGE,
@@ -59,7 +52,6 @@ export function assignCounter(player, counter) {
 }
 
 export function scanNetwork(startip, totalips) {
-    let players = {};
     return (dispatch,getState) => {
         let addressPrefix = startip.slice(0,startip.lastIndexOf('.')+1),
             address = parseInt(startip.slice(startip.lastIndexOf('.')+1)),
@@ -73,9 +65,9 @@ export function scanNetwork(startip, totalips) {
                 }
             }).then(
                 response => {
-                    response.json().then(parsedResponse => {
-                        if (parsedResponse.data.indexOf("PiSignage Player") >= 0) {
-                            checkPlayer(ip);
+                    response.text().then(parsedResponse => {
+                        if (parsedResponse.indexOf("PiSignage Player") >= 0) {
+                            dispatch(checkPlayer(ip));
                             cb();
                         }
                     });
@@ -88,7 +80,7 @@ export function scanNetwork(startip, totalips) {
         }
 
         async.eachLimit(ips,ips.length,pingPlayers,function(err) {
-            dispatch(scanPlayers(players));
+            
         })
     }
 }
