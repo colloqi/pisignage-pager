@@ -96,7 +96,8 @@ export function checkPlayer(ip) {
                 ip: ip,
                 enabled: true,
                 name: "",
-                active: false
+                active: false,
+                counter: getState().token.counters[0] || {}
             }
             dispatch(addPlayer(player))
         }

@@ -28,9 +28,14 @@ export default function reducer(state = initState, action) {
         case actionTypes.GENERATE_TOKENS:
             return Object.assign({}, state, {tokens: action.tokens})
         case actionTypes.ADD_COUNTER:
-            var counter = {name:action.counter, rollOverTime:null, lifeTime: null, deleteOnShow: false};
+            var counter = {name:action.counter, rollOverTime:null, lifeTime: null, deleteOnShow: false}, players = state.players;
             state.counters.length == 0 ? delete state.showingTokens['counter'] : '';
-            return Object.assign({}, state, {counters: state.counters.concat(counter)})
+            if (state.counters.length == 0) {
+                for(var player of players) {
+                    player.counter = counter;
+                }
+            }
+            return Object.assign({}, state, {counters: state.counters.concat(counter), players: players})
         case actionTypes.DEL_COUNTER:
             var counters = state.counters.filter(function (itm) {
                 return action.counter != itm;
