@@ -30,15 +30,15 @@ let PlayerList = React.createClass({
                 primaryText: <h3>{entry.ip}</h3>,
                 leftIcon: <DeleteIcon onTouchTap={this.props.deleteCb.bind(null,entry)} />,
                 rightToggle:<Toggle toggled={entry.enabled} onToggle={this.props.enableCb.bind(null,entry)}/>
-            }
+            }, counter = this.props.counters.find(function(obj) { return obj.name == entry.counter.name});
             if (entry.active) {
                 props.secondaryText = <h4>{entry.name}</h4>
                 props.style = {"backgroundColor": "lightGreen"}
             }
             if (entry.enabled) {
                 props.children = <ListItem>
-                                    <SelectField floatingLabelText='Select counter for the player' value={entry.counter}
-                                                onChange={this.props.counterCb.bind(null, entry)} >
+                                    <SelectField floatingLabelText='Select counter for the player' value={counter}
+                                                onChange={this.props.counterCb.bind(null, entry)} disabled={!entry.active}>
                                         {countersList}
                                     </SelectField>
                                     <FlatButton />

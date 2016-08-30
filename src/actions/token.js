@@ -102,7 +102,7 @@ export function displayToken(token, counter) {
             return obj.enabled && (!counter || (obj.counter && counter.name == obj.counter.name));
         })
         let object = {currentToken: token, tokens: getState().token.tokens, counterName: counter ? counter.name : ' ',
-                        rollOverTime: counter ? counter.rollOverTime : null,
+                        rollOverTime: counter ? counter.rollOverTime : null, volume: getState().token.settings.sound.volume,
                         lifeTime: counter ? counter.lifeTime : null, deleteOnShow: counter ? counter.deleteOnShow : null};
         function send(player, cb) {
             fetch('http://'+player.ip+':8000/'+urls.token, {

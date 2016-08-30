@@ -206,6 +206,11 @@ let TokenSettings = React.createClass({
                 onTouchTap={this.generateTokens}
             />
         ];
+        
+        let counterNames = [];
+        for(var counter of this.props.counters) {
+            counterNames.push(counter.name);
+        }
 
         let timer;
         if (this.state.setTimer) {
@@ -239,11 +244,12 @@ let TokenSettings = React.createClass({
                         <TextField
                             style={{width: "70%"}} type="text"
                             hintText="Add counters"
+                            errorText={counterNames.indexOf(this.state.counterText) >= 0 ? 'Counter already exists' : null}
                             value={this.state.counterText}
                             onChange={(e) => {e.stopPropagation();this.setState({counterText: e.target.value})}}
                         />
                         <FlatButton primary={true}
-                                    disabled={!this.state.counterText}
+                                    disabled={!this.state.counterText || counterNames.indexOf(this.state.counterText) >= 0}
                                     onTouchTap={this.addCounter}
                                     label="Add"
                         />
