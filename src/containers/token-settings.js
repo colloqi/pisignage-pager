@@ -222,6 +222,7 @@ let TokenSettings = React.createClass({
             timer = <div></div>;
         }
         
+        let changed = this.state.user != this.props.credentials.user || this.state.password != this.props.credentials.password;
         return (
             <div>
                 <List>
@@ -281,7 +282,7 @@ let TokenSettings = React.createClass({
                             onChange={(e) => {e.stopPropagation();this.setState({password: e.target.value})}}
                         />
                         <FlatButton primary={true}
-                                    disabled={!this.state.user || !this.state.password}
+                                    disabled={!this.state.user || !this.state.password || !changed}
                                     onTouchTap={this.saveUser}
                                     label="Save"
                         />
