@@ -28,7 +28,6 @@ export default {
 
     users:           base + 'api/users',
     
-    token:           base + 'api/tokens',
-    currentToken:    base + 'api/current-token'
+    token:           base + 'api/tokens'
 
 }

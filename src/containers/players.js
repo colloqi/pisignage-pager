@@ -40,8 +40,8 @@ let PlayerList = React.createClass({
                                     <SelectField floatingLabelText='Select counter for the player' value={counter}
                                                 onChange={this.props.counterCb.bind(null, entry)} disabled={!entry.active}>
                                         {countersList}
-                                    </SelectField>
-                                    <FlatButton />
+                                    </SelectField><br/>
+                                    <FlatButton label={entry.errorMessage} disabled={true}/>
                                 </ListItem>;
             }
             players.push(

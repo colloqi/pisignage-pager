@@ -36,7 +36,6 @@ export function assignCounter(player, counter) {
     return (dispatch, getState) => {
         var object = {rollOverTime: counter.rollOverTime, lifeTimer: counter.lifeTime, deleteOnShow: counter.deleteOnShow,
                         counterName: counter.name, currentToken: getState().token.showingTokens[counter.name]};
-        player.counter = counter;
         fetch('http://'+player.ip+':8000/'+urls.token, {
             method: 'POST',
             headers: {
@@ -45,8 +44,14 @@ export function assignCounter(player, counter) {
             },
             body: JSON.stringify(object)
         }).then(
-            response => dispatch(updatePlayer(player)),
-            error => dispatch(updatePlayer(player))
+            response => {
+                response.status < 400 ? player.counter = counter : player.errorMessage = 'Error setting counter: '+response.statusText;
+                dispatch(updatePlayer(player))
+            },
+            error => {
+                player.errorMessage = 'Error: could not set counter to player';
+                dispatch(updatePlayer(player))
+            }
         )
     }
 }
@@ -109,18 +114,24 @@ export function checkPlayer(ip) {
             }
         }).then(
             response => {
-                response.json().then(function (data) {
-                    if (!data.success) {
-                        player.active = false
-                        dispatch(updatePlayer(player))
-                    } else {
-                        player.name = data.data.name
-                        player.active = true
-                        player.version = data.data.version
-                        
-                        dispatch(updatePlayer(player))
-                    }
-                })
+                if (response.status > 400) {
+                    player.errorMessage = 'Error accessing player: '+response.statusText;
+                    dispatch(updatePlayer(player))
+                } else {
+                    player.errorMessage = null;
+                    response.json().then(function (data) {
+                        if (!data.success) {
+                            player.active = false
+                            dispatch(updatePlayer(player))
+                        } else {
+                            player.name = data.data.name
+                            player.active = true
+                            player.version = data.data.version
+                            
+                            dispatch(updatePlayer(player))
+                        }
+                    })
+                }
             },
             error => {
                 player.active = false
