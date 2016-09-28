@@ -32,6 +32,9 @@ let setRollOverTimer = function(dispatch, getState, counter) {
             enabledPlayers = getState().token.players.filter(function(obj) {
                 return obj.enabled && (!counter || (obj.counter && obj.counter.name === counter.name));
             });
+        if (enabledPlayers.length == 0) {
+            return;
+        }
         fetch('http://'+enabledPlayers[0].ip+':8000/'+urls.token, {
             method: 'GET',
             headers: {

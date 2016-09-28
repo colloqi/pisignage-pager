@@ -28,6 +28,7 @@ export default {
 
     users:           base + 'api/users',
     
-    token:           base + 'api/tokens'
+    token:           base + 'api/tokens',
+    tokenFile:       base + 'api/token-file'
 
 }

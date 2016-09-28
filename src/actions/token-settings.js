@@ -88,3 +88,28 @@ export function editCounter(counter) {
         })
     }
 }
+
+export function uploadSoundFile(file) {
+    return (dispatch, getState) => {
+        var enabledPlayers = getState().token.players.filter(function(obj) {
+            return obj.enabled && obj.active;
+        })
+        var formData = new FormData();
+        formData.append('file', file);
+        function sendFile(player, cb) {
+            fetch('http://'+player.ip+':8000/'+urls.tokenFile, {
+                method: 'POST',
+                headers: {
+                    'authorization': getState().token.settings.credentials.token
+                },
+                body: formData
+            }).then(
+                response => cb(),
+                error => cb()
+            )
+        }
+        async.eachLimit(enabledPlayers, enabledPlayers.length, sendFile, function() {
+            
+        })
+    }
+}

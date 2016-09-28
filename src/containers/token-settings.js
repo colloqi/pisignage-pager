@@ -15,7 +15,7 @@ import Slider from 'material-ui/Slider';
 
 import DeleteIcon from 'material-ui/svg-icons/action/delete';
 
-import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser, clearAllSettings, editCounter, deleteOnShow} from "../actions/token-settings"
+import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser, clearAllSettings, editCounter, deleteOnShow, uploadSoundFile} from "../actions/token-settings"
 
 let VolumeLevel = React.createClass({
 
@@ -31,7 +31,7 @@ let VolumeLevel = React.createClass({
                 <Slider
                     name="volume"
                     min={0}
-                    max={10}
+                    max={100}
                     step={1}
                     value={this.props.volume}
                     onChange={this.handleChange}
@@ -180,6 +180,10 @@ let TokenSettings = React.createClass({
         this.setState({volume:value})
         this.props.dispatch(setVolume(value))
     },
+    uploadFile: function (evt) {
+        console.log(evt.target);
+        this.props.dispatch(uploadSoundFile(evt.target.files[0]));
+    },
     saveUser: function () {
         this.props.dispatch(setUser(this.state.user,this.state.password))
     },
@@ -257,6 +261,10 @@ let TokenSettings = React.createClass({
                     </ListItem>
                     <Divider />
                     <Subheader>Sound</Subheader>
+                    <ListItem>
+                        <label>Upload audio file to play when a token gets displayed:  
+                                        <input type='file' onChange={this.uploadFile} /></ label>
+                    </ListItem>
                     <ListItem><VolumeLevel volume={this.state.volume} cb={this.setVolume}/></ListItem>
                     <Divider />
                     <Subheader>Player Credentials</Subheader>
