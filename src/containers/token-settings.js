@@ -1,41 +1,38 @@
 import React, {Component, PropTypes} from 'react';
 import {connect} from 'react-redux';
 
-import Subheader from 'material-ui/Subheader';
-import {List, ListItem} from 'material-ui/List';
-import TextField from 'material-ui/TextField';
-import Dialog from 'material-ui/Dialog';
-import Snackbar from 'material-ui/Snackbar';
-import RaisedButton from 'material-ui/RaisedButton'
+import {List, ListItem, Button, Icon, CheckBox, InputGroup, Input,
+        Text, Row, Card, CardItem, H3, Container, Content} from 'native-base';
+import {ToastAndroid, View, Slider, StyleSheet, ScrollView, Dimensions, KeyboardAvoidingView, Modal} from 'react-native';
 
-import FlatButton from 'material-ui/FlatButton';
-import Divider from 'material-ui/Divider';
-import Slider from 'material-ui/Slider';
+import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser, clearAllSettings, editCounter, deleteOnShow, uploadSoundFile} from "../actions/token-settings"
 
-import DeleteIcon from 'material-ui/svg-icons/action/delete';
-
-import {clearTokens, generateTokens, setVolume, addCounter, delCounter, setUser, clearAllSettings} from "../actions/token-settings"
+var {height, width} = Dimensions.get('window');
+var style = StyleSheet.create({
+    scrollView: {
+        height: height - 120
+    }
+})
 
 let VolumeLevel = React.createClass({
 
-    handleChange(event, value) {
-        event.stopPropagation();
+    handleChange(value) {
         this.props.cb(value);
     },
 
     render() {
         return (
-            <div>
-                <small>Volume Level</small>
+            <View>
+                <Text>Volume Level</Text>
                 <Slider
                     name="volume"
-                    min={0}
-                    max={10}
+                    minimumValue={0}
+                    maximumValue={100}
                     step={1}
                     value={this.props.volume}
-                    onChange={this.handleChange}
+                    onValueChange={this.handleChange}
                 />
-            </div>
+            </View>
         );
     }
 })
@@ -45,20 +42,118 @@ VolumeLevel.propTypes = {
     cb: PropTypes.func.isRequired,
 };
 
+let RolloverTimer = React.createClass({
+    getInitialState: function() {
+        return {setTimer: this.props.counter.rollOverTime ? true : false, rollOverTime:this.props.counter.rollOverTime}
+    },
+    editTimer: function() {
+        let counter = this.props.counter;
+        counter.rollOverTime = this.state.rollOverTime;
+        this.props.editCounter(counter);
+    },
+    unsetTimer: function(evt) {
+        var counter = this.props.counter;
+        counter.rollOverTime = null;
+        this.props.editCounter(counter);
+        this.setState({setTimer: !this.state.setTimer, rollOverTime:null});
+    },
+    render: function() {
+        var timer = <Text></Text>;
+        if (this.state.setTimer) {
+            timer = <InputGroup iconRight success>
+                        <Input onChange={(evt) => {this.setState({rollOverTime: evt.nativeEvent.text})}}
+                            value={this.state.rollOverTime} placeholder='Display next token after (seconds)' />
+                        <Icon onPress={this.editTimer} name='check-circle' />
+                    </InputGroup>;
+        }
+        return <View>
+            <Row>
+                <CheckBox onPress={this.unsetTimer} checked={this.state.setTimer} />
+                <Text>Auto-display tokens one after another</Text>
+            </Row>
+            {timer}
+        </View>
+    }
+})
+
+let LifeTimer = React.createClass({
+    getInitialState: function() {
+        return {setTimer: this.props.counter.lifeTime ? true : false, lifeTime:this.props.counter.lifeTime}
+    },
+    editTimer: function() {
+        let counter = this.props.counter;
+        counter.lifeTime = this.state.setTimer ? this.state.lifeTime : null;
+        this.props.editCounter(counter);
+    },
+    unsetTimer: function(evt) {
+        var counter = this.props.counter;
+        counter.lifeTime = null;
+        this.props.editCounter(counter);
+        this.setState({setTimer: !this.state.setTimer, lifeTime:null});
+    },
+    render: function() {
+        var timer = <Text></Text>;
+        if (this.state.setTimer) {
+            timer = <InputGroup iconRight success>
+                        <Input onChange={(evt) => {this.setState({lifeTime: evt.nativeEvent.text})}}
+                            value={this.state.lifeTime} placeholder='Delete all tokens after (seconds)' />
+                        <Icon onPress={this.editTimer} name='check-circle' />
+                    </InputGroup>;
+        }
+        return <View>
+                <Row>
+                    <CheckBox onPress={this.unsetTimer} checked={this.state.setTimer} />
+                    <Text>Delete tokens after pre-set time</Text>
+                </Row>
+                {timer}
+            </View>
+    }
+})
+
+let DeleteOnShow = React.createClass({
+    getInitialState: function() {
+        return {counter: this.props.counter};
+    },
+    toggle: function() {
+        var counter = this.props.counter;
+        counter.deleteOnShow = !counter.deleteOnShow;
+        this.props.editCounter(counter);
+        this.setState({counter: counter});
+    },
+    render: function() {
+        var entry = this.state.counter;
+        return (
+            <View>
+                <Row>
+                    <CheckBox onPress={this.toggle} checked={entry.deleteOnShow} />
+                    <Text>Delete tokens after display</Text>
+                </Row>
+            </View>
+        )
+    }
+})
+
 let CounterList = React.createClass({
-    render: function () {
+    render() {
         let counters = [];
         for (let entry of this.props.counters) {
+            var timers = [
+                    <DeleteOnShow counter={entry} editCounter={this.props.editCounter} key={'deleteOnShow'} />,
+                    <RolloverTimer counter={entry} editCounter={this.props.editCounter} key='rollOver'/>,
+                    <LifeTimer counter={entry} editCounter={this.props.editCounter} key='lifeTime'/>
+                ];
             counters.push(
-                <ListItem key={entry} primaryText={entry}
-                          rightIcon={<DeleteIcon onTouchTap={this.props.cb.bind(null,entry)} />
-                }/>
+                <ListItem key={entry.name} iconRight>
+                    <H3>{entry.name}</H3>
+                    {timers}
+                    <Icon name='delete' onPress={this.props.cb.bind(null,entry)}/>
+                </ListItem>
             )
         }
         return (
-            <div>
+            <List>
                 {counters}
-            </div>
+            </List>
         )
     }
 })
@@ -67,7 +162,6 @@ CounterList.propTypes = {
     counters: PropTypes.array.isRequired,
     cb: PropTypes.func.isRequired
 };
-
 
 let TokenSettings = React.createClass({
     getInitialState: function () {
@@ -80,7 +174,7 @@ let TokenSettings = React.createClass({
             user: this.props.credentials.user,
             password: this.props.credentials.password,
             from: this.props.counter.from,
-            till: this.props.counter.till
+            till: this.props.counter.till,
         })
     },
     displayModalOpen: function () {
@@ -90,10 +184,7 @@ let TokenSettings = React.createClass({
         this.setState({modalOpen: false});
     },
     snackbarModalOpen: function (text) {
-        this.setState({snackbarOpen: true, snackbarText: text});
-    },
-    snackbarModalClose: function () {
-        this.setState({snackbarOpen: false});
+        ToastAndroid.showWithGravity(text,ToastAndroid.SHORT,ToastAndroid.TOP);
     },
     generateTokens: function () {
         let tokens = []
@@ -101,7 +192,7 @@ let TokenSettings = React.createClass({
             tokens.push(i);
         }
         this.props.dispatch(generateTokens(tokens))
-        this.displayModalClose()
+        this.displayModalClose();
     },
     clearTokens: function () {
         this.props.dispatch(clearTokens())
@@ -118,6 +209,10 @@ let TokenSettings = React.createClass({
         this.setState({volume:value})
         this.props.dispatch(setVolume(value))
     },
+    uploadFile: function (evt) {
+        console.log(evt.target);
+        this.props.dispatch(uploadSoundFile(evt.target.files[0]));
+    },
     saveUser: function () {
         this.props.dispatch(setUser(this.state.user,this.state.password))
     },
@@ -125,122 +220,111 @@ let TokenSettings = React.createClass({
         this.props.dispatch(clearAllSettings())
         this.snackbarModalOpen("Cleared all the Settings");
     },
+    editCounter: function (counter) {
+        this.props.dispatch(editCounter(counter));
+    },
+    deleteOnShow: function (evt, isChecked) {
+        this.props.dispatch(deleteOnShow(isChecked));
+    },
     render: function () {
-        const modelActions = [
-            <FlatButton
-                label="Cancel"
-                secondary={true}
-                onTouchTap={this.displayModalClose}
-            />,
-            <RaisedButton
-                label="Ok"
-                primary={true}
-                onTouchTap={this.generateTokens}
-            />
-        ];
+        let counterNames = [];
+        for(var counter of this.props.counters) {
+            counterNames.push(counter.name);
+        }
 
+        let changed = this.state.user != this.props.credentials.user || this.state.password != this.props.credentials.password;
         return (
-            <div>
-                <List>
-                    <Subheader>Token Settings</Subheader>
-                    <ListItem
-                        primaryText="Generate Tokens"
-                        secondaryText="Creates tokens between 2 values"
-                        onTouchTap={this.displayModalOpen}
-                    />
-                    <ListItem
-                        primaryText="Clear All Tokens"
-                        secondaryText="Clears existing Tokens"
-                        onTouchTap={this.clearTokens}
-                    />
-                    <Divider />
-                    <Subheader>Counters</Subheader>
-                    <CounterList counters={this.props.counters} cb={this.delCounter}/>
-                    <ListItem>
-                        <TextField
-                            style={{width: "70%"}} type="text"
-                            hintText="Add counters"
-                            value={this.state.counterText}
-                            onChange={(e) => {e.stopPropagation();this.setState({counterText: e.target.value})}}
-                        />
-                        <FlatButton primary={true}
-                                    disabled={!this.state.counterText}
-                                    onTouchTap={this.addCounter}
-                                    label="Add"
-                        />
+            <KeyboardAvoidingView behavior='position' style={{flex: 1}}>
+                <ScrollView style={style.scrollView} >
+                    <ListItem itemDivider><Text>Token Settings</Text></ListItem>
+                    <ListItem onPress={this.displayModalOpen} iconLeft>
+                        <Text>Generate Tokens</Text>
+                        <Text note>Create tokens between 2 values</Text>
+                        <Icon name='create' />
                     </ListItem>
-                    <Divider />
-                    <Subheader>Sound</Subheader>
-                    <ListItem><VolumeLevel volume={this.state.volume} cb={this.setVolume}/></ListItem>
-                    <Divider />
-                    <Subheader>Player Credentials</Subheader>
-                    <ListItem>
-                        <TextField
-                            style={{width: "70%"}}
-                            type="text"
+                    <ListItem onPress={this.clearTokens} iconLeft>
+                        <Text>Clear all Tokens</Text>
+                        <Text note>Clears existing Tokens</Text>
+                        <Icon name='clear-all' />
+                    </ListItem>
+                    <ListItem itemDivider><Text>Counters</Text></ListItem>
+                    <CounterList counters={this.props.counters} cb={this.delCounter} editCounter={this.editCounter}/>
+                    <InputGroup iconRight>
+                        <Input placeholder="Add counters"
+                            errorText={counterNames.indexOf(this.state.counterText) >= 0 ? 'Counter already exists' : null}
+                            value={this.state.counterText}
+                            onChange={(e) => {this.setState({counterText: e.nativeEvent.text})}}
+                        />
+                        <Icon disabled={!this.state.counterText || counterNames.indexOf(this.state.counterText) >= 0}
+                                    onPress={this.addCounter} name='add' />
+                    </InputGroup>
+                    <ListItem itemDivider><Text>Sound</Text></ListItem>
+                    <VolumeLevel volume={this.state.volume || 0} cb={this.setVolume}/>
+                    <ListItem itemDivider><Text>Player Credentials</Text></ListItem>
+                    <InputGroup iconLeft>
+                        <Icon name='account-circle' />
+                        <Input
                             name="user"
                             hintText=""
-                            floatingLabelText="User Name"
+                            placeholder="User Name"
                             value={this.state.user}
-                            onChange={(e) => {e.stopPropagation();this.setState({user: e.target.value})}}
+                            onChange={(e) => {this.setState({user: e.nativeEvent.text})}}
                         />
-                    </ListItem>
-                    <ListItem>
-                        <TextField
-                            style={{width: "70%"}}
-                            type="password"
+                    </InputGroup>
+                    <InputGroup iconLeft>
+                        <Icon name='lock' />
+                        <Input
                             name="password"
                             hintText=""
-                            floatingLabelText="Password"
+                            placeholder="Password"
                             value={this.state.password}
-                            onChange={(e) => {e.stopPropagation();this.setState({password: e.target.value})}}
+                            onChange={(e) => {this.setState({password: e.nativeEvent.text})}}
+                            secureTextEntry={true}
                         />
-                        <FlatButton primary={true}
-                                    disabled={!this.state.user || !this.state.password}
-                                    onTouchTap={this.saveUser}
-                                    label="Save"
-                        />
+                    </InputGroup>
+                    <Button disabled={!this.state.user || !this.state.password || !changed} onPress={this.saveUser} block info>
+                        <Text>Save</Text>
+                    </Button>
+                    <ListItem onPress={this.clearAllSettings} iconLeft>
+                        <Text>Clear All Settings</Text>
+                        <Text note>Delete all settings and goes to default</Text>
+                        <Icon name='settings-backup-restore' />
                     </ListItem>
-                    <Divider />
-                    <ListItem
-                        primaryText="Clear All Settings"
-                        secondaryText="Delete all settings and goes to default"
-                        onTouchTap={this.clearAllSettings}
-                    />
-
-
-                </List>
-                <Dialog
-                    title="Auto Generate"
-                    actions={modelActions}
-                    modal={false}
-                    open={this.state.modalOpen}
+                </ScrollView>
+                <Modal
+                    visible={this.state.modalOpen} style={{height: height * 0.3}} transparent={true}
                     onRequestClose={this.displayModalClose}
                 >
-                    <TextField
-                        type="number"
-                        name="from"
-                        hintText=""
-                        floatingLabelText="From"
-                        value= {this.state.from}
-                        onChange={(e) => {e.stopPropagation();this.setState({from: e.target.value})}}
-                    /><br/>
-                    <TextField
-                        type="number"
-                        name="till"
-                        hintText=""
-                        floatingLabelText="Till"
-                        value= {this.state.till}
-                        onChange={(e) => {e.stopPropagation();this.setState({till: e.target.value})}}
-                    />
-                </Dialog>
-                <Snackbar
-                    open={this.state.snackbarOpen}
-                    message={this.state.snackbarText}
-                    autoHideDuration={2000}
-                    onRequestClose={this.snackbarModalClose}
-                />
-            </div>
+                    <View style={{height: 200, flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)'}}>
+                        <View style={{backgroundColor:'#fff'}}>
+                            <InputGroup iconLeft success>
+                                <Input
+                                    keyboardType="numeric"
+                                    name="from"
+                                    hintText=""
+                                    placeholder="From"
+                                    value= {this.state.from.toString()}
+                                    onChange={(e) => {this.setState({from: e.nativeEvent.text})}}
+                                />
+                            </InputGroup>
+                            <InputGroup iconLeft success >
+                                <Input
+                                    keyboardType="numeric"
+                                    name="till"
+                                    hintText=""
+                                    placeholder="Till"
+                                    value= {this.state.till.toString()}
+                                    onChange={(e) => {this.setState({till: e.nativeEvent.text})}}
+                                />
+                            </InputGroup>
+                            <View style={{flex: 2, flexDirection: 'row', justifyContent:'space-between'}}>
+                                <Button bordered success onPress={this.generateTokens}>OK</Button>
+                                <Button bordered info onPress={this.displayModalClose}>Cancel</Button>
+                            </View>
+                        </View>
+                    </View>
+                </Modal>
+            </KeyboardAvoidingView>
         )
     }
 })
@@ -257,7 +341,9 @@ function mapStateToProps(state) {
         sound: state.token.settings.sound,
         credentials: state.token.settings.credentials,
         counter: state.token.settings.counter,
-        counters: state.token.counters
+        counters: state.token.counters,
+        rollOverTime: state.token.settings.rollOverTime,
+        deleteOnShow: state.token.settings.deleteOnShow
     };
 }
 

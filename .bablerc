@@ -1,0 +1,10 @@
+{
+    "presets": [
+        "react-native",
+        "es2016"
+    ],
+    "plugins": [
+        "transform-decorators-legacy",
+        "add-module-exports"
+    ]
+}

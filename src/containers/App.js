@@ -14,15 +14,13 @@ class App extends Component {
         let {history} = this.props;
 
         return (
-            <Router histoy={history}>
-                <Route path='/' component={Layout} />
-            </Router>
+            <Layout />
         );
     }
 }
 
 App.propTypes = {
-    history: PropTypes.object.isRequired,
+    
 };
 
 /**
